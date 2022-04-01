@@ -58,7 +58,7 @@ jobs:
           description: "Test Deployment"
           last-updated: '${{github.event.head_commit.timestamp}}'
           label: 'Test Deployment Label'
-          state: '${{env.DEPLOY_STATE}}'
+          state: '${{env.BUILD_STATE}}'
           environment-id: 'Test'
           environment-display-name: 'Test'
           environment-type: 'testing'
