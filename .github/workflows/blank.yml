@@ -48,22 +48,20 @@ jobs:
       - name: Push Build Info to Jira
         if: steps.jira_keys.outputs.jira-keys != ''
         id: push_build_info_to_jira
-        uses: HighwayThree/jira-upload-build-info@master
+        uses: HighwayThree/jira-upload-deployment-info@master
         with:
-          cloud-instance-base-url: '${{ secrets.CLOUD_INSTANCE_BASE_URL }}'
           client-id: '${{ secrets.CLIENT_ID }}'
           client-secret: '${{ secrets.CLIENT_SECRET }}'
-          pipeline-id: '${{ github.repository }} ${{ github.workflow }}'
-          build-number: ${{ github.run_number }}
-          build-display-name: 'Workflow: ${{ github.workflow }} (#${{ github.run_number }})'
-          build-state: '${{env.BUILD_STATE}}'
-          build-url: '${{github.event.repository.url}}/actions/runs/${{github.run_id}}'
-          update-sequence-number: '${{ github.run_id }}'
-          last-updated: '${{github.event.head_commit.timestamp}}'
+          cloud-instance-base-url: '${{ secrets.CLOUD_INSTANCE_BASE_URL }}'
           issue-keys: "${{ steps.jira_keys.outputs.jira-keys }}"
-          commit-id: '${{ github.sha }}'
-          repo-url: '${{ github.event.repository.url }}'
-          build-ref-url: '${{ github.event.repository.url }}/actions/runs/${{ github.run_id }}'
+          display-name: "Deployment Number 1"
+          description: "Test Deployment"
+          last-updated: '${{github.event.head_commit.timestamp}}'
+          label: 'Test Deployment Label'
+          state: '${{env.DEPLOY_STATE}}'
+          environment-id: 'Test'
+          environment-display-name: 'Test'
+          environment-type: 'testing'
       - name: Confirm Jira Build Output
         if: success()
         run: |
