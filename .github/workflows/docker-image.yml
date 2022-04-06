@@ -15,6 +15,6 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: set permission
-      run: ls
+      run: chmod +x ./scripts/build-image.sh
     - name: build-image
-      run: ./scripts/docker-image.sh
+      run: ./scripts/build-image.sh
