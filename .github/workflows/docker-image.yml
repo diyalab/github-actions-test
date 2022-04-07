@@ -40,5 +40,5 @@ jobs:
             owner: spotdraft
             name: django-rest-api
             # NOTE: using Personal Access Token
-            token: ${{ secrets.GITHUB_TOKEN }}
+            token: ${{ secrets.PAT }}
             tag: ${{ github.ref_name }}
