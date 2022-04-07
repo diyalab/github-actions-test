@@ -22,6 +22,13 @@ jobs:
     - name: Log in to registry
       # This is where you will update the PAT to GITHUB_TOKEN
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
+    - name: Build branch image
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        file: Dockerfile
+        push: true
+        tags: ghcr.io/diyalab/django-rets-api:${{ github.ref_name }}
 #     - name: Push image
 #       run: |
 #         IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
