@@ -40,5 +40,5 @@ jobs:
             owner: diyalab
             name: django-rets-api
             # NOTE: using Personal Access Token
-            token: ${{ secrets.PAT }}
+            token: ${{ secrets.GHCR_TOKEN }}
             tag: ${{ github.ref_name }}
