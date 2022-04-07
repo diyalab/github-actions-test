@@ -37,8 +37,8 @@ jobs:
           uses: bots-house/ghcr-delete-image-action@v1.0.0
           with:
             # NOTE: at now only orgs is supported
-            owner: spotdraft
-            name: django-rest-api
+            owner: diyalab
+            name: django-rets-api
             # NOTE: using Personal Access Token
             token: ${{ env.GHCR_TOKEN }}
             tag: ${{ github.ref_name }}
