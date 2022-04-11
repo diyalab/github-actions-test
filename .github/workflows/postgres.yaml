@@ -1,0 +1,27 @@
+name: Build postgres image with Test Data
+on:
+  schedule:
+    # Runs "at minute 55 past every hour" (see https://crontab.guru)
+    - cron: "* * * * *"
+env:
+  MIGRATION_DB_SQL_FILE: resources/test_database/migrations_dump.sql
+jobs:
+  build:
+    services:
+      postgres:
+        image: postgres:11.3
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    name: Build custom Postgres Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run migrations
+        # Hit the webhook endpoint to rebuild  from the "main" branch
+        run: |
+          export DATABASE_URL=postgres://postgres@postgres:5432/test_spotdraft-django-rest-api
+          docker ps
