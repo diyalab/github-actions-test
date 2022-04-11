@@ -2,7 +2,7 @@ name: Build postgres image with Test Data
 on:
   schedule:
     # Runs "at minute 55 past every hour" (see https://crontab.guru)
-    - cron: "* * * * *"
+    - cron: "45 16 * * *"
 env:
   MIGRATION_DB_SQL_FILE: resources/test_database/migrations_dump.sql
 jobs:
