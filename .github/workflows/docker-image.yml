@@ -8,37 +8,22 @@ on:
 env:
   IMAGE_NAME: github-actions-test
 jobs:
-
   build:
-
+    services:
+      postgres:
+        image: postgres:11.3
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    name: Build custom Postgres Image
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v3
-    - name: set permission
-      run: chmod +x ./scripts/build-image.sh
-    - name: build-image
-      run: ./scripts/build-image.sh
-    - name: Log in to registry
-      # This is where you will update the PAT to GITHUB_TOKEN
-      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
-    - name: Build branch image
-      uses: docker/build-push-action@v2
-      with:
-        context: .
-        file: Dockerfile
-        push: true
-        tags: ghcr.io/diyalab/django-rets-api:main1
-  purge-image:
-      name: Delete image from ghcr.io
-      runs-on: ubuntu-latest
-      steps:
-        - name: Delete image
-          uses: bots-house/ghcr-delete-image-action@v1.0.0
-          with:
-            # NOTE: at now only orgs is supported
-            owner: diyalab
-            name: django-rets-api
-            # NOTE: using Personal Access Token
-            token: ${{ secrets.GHCR_TOKEN }}
-            tag: ${{ github.ref_name }}
+      - name: Run migrations
+        # Hit the webhook endpoint to rebuild  from the "main" branch
+        run: |
+          export DATABASE_URL=postgres://postgres@postgres:5432/test_spotdraft-django-rest-api
+          docker ps
