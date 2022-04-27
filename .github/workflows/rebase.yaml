@@ -10,12 +10,12 @@ jobs:
     steps:
       - name: work around permission issue
         run: |
-          export GIT_CEILING_DIRECTORIES=/github/workspace
+          export GIT_CEILING_DIRECTORIES=/__w
           git --version
       - name: Checkout the latest code
         uses: actions/checkout@v2
         with:
-          token: ${{ secrets.GHCR_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0 # otherwise, you will fail to push refs to dest repo
       - name: Automatic Rebase
         uses: cirrus-actions/rebase@1.5
