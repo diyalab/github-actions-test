@@ -9,7 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: work around permission issue
-        run: export GIT_CEILING_DIRECTORIES=/github/workspace
+        run: |
+          export GIT_CEILING_DIRECTORIES=/github/workspace
+          git --version
       - name: Checkout the latest code
         uses: actions/checkout@v2
         with:
