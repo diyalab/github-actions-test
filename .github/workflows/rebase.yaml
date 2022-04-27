@@ -9,9 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: work around permission issue
-        run: export GIT_CEILING_DIRECTORIES=/github/workspace
+        run: export GIT_CEILING_DIRECTORIES=/__w
       - name: Checkout the latest code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
         with:
           token: ${{ secrets.GHCR_TOKEN }}
           fetch-depth: 0 # otherwise, you will fail to push refs to dest repo
