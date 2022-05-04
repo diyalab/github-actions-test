@@ -27,5 +27,3 @@ jobs:
         run: |
           export DATABASE_URL=postgres://postgres@postgres:5432/test_spotdraft-django-rest-api
           docker ps
-          export posgres_container_name=`docker ps --format '{{.Names}}' | grep postgres`
-          echo $posgres_container_name
