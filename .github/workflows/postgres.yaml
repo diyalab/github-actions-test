@@ -1,17 +1,10 @@
-name: Docker Image CI
-
-# on:
-#   push:
-#     branches: [ main ]
-#   pull_request:
-#     branches: [ main ]
+name: Build postgres image with Test Data
 on:
-  pull_request:
-    types: [opened]
-  issue_comment:
-    types: [created]
+  schedule:
+    # Runs "at minute 55 past every hour" (see https://crontab.guru)
+    - cron: "45 16 * * *"
 env:
-  IMAGE_NAME: github-actions-test
+  MIGRATION_DB_SQL_FILE: resources/test_database/migrations_dump.sql
 jobs:
   build:
     services:
@@ -27,19 +20,8 @@ jobs:
     name: Build custom Postgres Image
     runs-on: ubuntu-latest
     steps:
-      - uses: khan/pull-request-comment-trigger@v1.1.0
-        id: check
-        with:
-          trigger: '@deploy'
-          reaction: rocket
-        env:
-          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
       - name: Run migrations
-        if: steps.check.outputs.triggered == 'true'
         # Hit the webhook endpoint to rebuild  from the "main" branch
-        env:
-          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
-
         run: |
           export DATABASE_URL=postgres://postgres@postgres:5432/test_spotdraft-django-rest-api
           docker ps
