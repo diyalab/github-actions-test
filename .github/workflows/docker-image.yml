@@ -37,6 +37,8 @@ jobs:
       - name: Run migrations
         if: steps.check.outputs.triggered == 'true'
         # Hit the webhook endpoint to rebuild  from the "main" branch
+        env:
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
         run: |
           export DATABASE_URL=postgres://postgres@postgres:5432/test_spotdraft-django-rest-api
           docker ps
