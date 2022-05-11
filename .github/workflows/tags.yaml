@@ -14,7 +14,7 @@ jobs:
         uses: mikepenz/release-changelog-builder-action@v3.0.0-rc01
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: "echoo0"
+      - name: "echoo0o"
         env:
           from_tag: ${{ steps.build_changelog.outputs.fromTag }}
           to_tag: ${{ steps.build_changelog.outputs.toTag }}
