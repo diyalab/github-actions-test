@@ -25,6 +25,7 @@ jobs:
         run: |
           echo $from_tag
           echo $to_tag
+          echo $changelog
       # - name: "Complex Configuration"
       #   id: build_changelog
       #   if: startsWith(github.ref, 'refs/tags/')
