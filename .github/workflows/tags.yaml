@@ -21,6 +21,7 @@ jobs:
         env:
           from_tag: ${{ steps.build_changelog.outputs.fromTag }}
           to_tag: ${{ steps.build_changelog.outputs.toTag }}
+          changelog: ${{ steps.build_changelog.outputs.changelog }}
         run: |
           echo $from_tag
           echo $to_tag
