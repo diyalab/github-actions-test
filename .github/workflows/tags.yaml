@@ -26,15 +26,19 @@ jobs:
           echo $from_tag
           echo $to_tag
           echo $changelog
-      # - name: "Complex Configuration"
-      #   id: build_changelog
-      #   if: startsWith(github.ref, 'refs/tags/')
-      #   uses: mikepenz/release-changelog-builder-action@v3.0.0-rc01
-      #   with:
-      #     configuration: "configuration_complex.json"
-      #     owner: "mikepenz"
-      #     repo: "release-changelog-builder-action"
-      #     ignorePreReleases: "false"
-      #     fromTag: "0.3.0"
-      #     toTag: "0.5.0"
-      #     token: ${{ secrets.PAT }}
+      - name: "Complex Configuration"
+        id: build_changelog2
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: mikepenz/release-changelog-builder-action@v3.0.0-rc01
+        with:
+          # configuration: "configuration_complex.json"
+          owner: "diyalab"
+          repo: "github-actions-test"
+          ignorePreReleases: "false"
+          fromTag: "qa_20220511_RC10"
+          toTag: "qa_20220511_RC9"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commitMode: "true"
+      - name: "echo"
+        run: |
+          echo ${{ steps.build_changelog2.outputs.changelog }}
