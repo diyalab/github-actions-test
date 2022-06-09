@@ -29,7 +29,7 @@ jobs:
           echo ${{ steps.release-name.outputs.release }}
           git pull
           git branch -a
-          if git rev-parse --verify --quiet test > /dev/null; then
+          if git rev-parse --verify --quiet remotes/origin/test > /dev/null; then
             echo "Branch name ${{ steps.release-name.outputs.release }} already exists."
             exit 1
           fi
