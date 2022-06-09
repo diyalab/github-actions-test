@@ -25,7 +25,7 @@ jobs:
       - name: create-release-barnch
         run: |
           echo ${{ steps.release-name.outputs.release }}
-          git branch --list test-tags
+          git branch --list test-tags123
           if [ `git branch --list test-tags` ]; then
             echo "Branch name ${{ steps.release-name.outputs.release }} already exists."
             exit 1
