@@ -4,8 +4,8 @@ on:
     inputs:
       name:
         required: true
-        type: string
-        description: Environment name
+        type: choice
+        description: Environment Name
         options:
           - QA
           - PROD
