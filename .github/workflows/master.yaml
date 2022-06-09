@@ -27,7 +27,7 @@ jobs:
       - name: create-release-barnch
         run: |
           echo ${{ steps.release-name.outputs.release }}
-          if git rev-parse --verify --quiet test-tags > /dev/null; then
+          if git rev-parse --verify --quiet test > /dev/null; then
             echo "Branch name ${{ steps.release-name.outputs.release }} already exists."
             exit 1
           fi
