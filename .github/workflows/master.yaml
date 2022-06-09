@@ -23,7 +23,14 @@ jobs:
           echo "::set-output name=release::release-$date"
 
       - name: create-release-barnch
-        run: echo ${{ steps.release-name.outputs.release }}
+        run: |
+          echo ${{ steps.release-name.outputs.release }}
+          if [ `git branch --list ${{ steps.release-name.outputs.release }}` ]
+          then
+            echo "Branch name ${{ steps.release-name.outputs.release }} already exists."
+            exit 1
+          fi
+          echo "branch does not exists"
       # - name: Initialize mandatory git config
       #   run: |
       #     git config user.name "GitHub Actions"
