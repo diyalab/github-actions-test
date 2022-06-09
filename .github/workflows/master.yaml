@@ -27,8 +27,6 @@ jobs:
       - name: create-release-barnch
         run: |
           echo ${{ steps.release-name.outputs.release }}
-          # git checkout -b ${{ steps.release-name.outputs.release }}
-          # git branch -a
           if git rev-parse --verify --quiet remotes/origin/${{ steps.release-name.outputs.release }} > /dev/null; then
             echo "Branch name ${{ steps.release-name.outputs.release }} already exists."
             exit 1
