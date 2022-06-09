@@ -15,8 +15,16 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v2
+      - name: make release branch name
+        id: release-name
+        shell: bash
+        run: |
+          date=`echo $(date '+%Y-%m-%d') | tr -d '-'`
+          release-name=release-$date
+          echo "::set-output name=release::$release-name"
+
       - name: create-release-barnch
-        run: git checkout -b release-20220609
+        run: echo ${{ steps.release-name.outputs.release }}
       # - name: Initialize mandatory git config
       #   run: |
       #     git config user.name "GitHub Actions"
