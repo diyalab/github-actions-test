@@ -27,6 +27,7 @@ jobs:
       - name: create-release-barnch
         run: |
           echo ${{ steps.release-name.outputs.release }}
+          git pull
           git branch
           if git rev-parse --verify --quiet test > /dev/null; then
             echo "Branch name ${{ steps.release-name.outputs.release }} already exists."
