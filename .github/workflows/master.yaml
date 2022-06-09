@@ -20,8 +20,7 @@ jobs:
         shell: bash
         run: |
           date=`echo $(date '+%Y-%m-%d') | tr -d '-'`
-          release-name=release-$date
-          echo "::set-output name=release::$release-name"
+          echo "::set-output name=release::release-$release-name"
 
       - name: create-release-barnch
         run: echo ${{ steps.release-name.outputs.release }}
