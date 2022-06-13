@@ -38,9 +38,9 @@ jobs:
         run: |
           git config user.name "GitHub Actions"
           git config user.email noreply@github.com
-      - name: push Brach to remote
+      - name: push Branch to remote
         run: git push -u origin ${{ steps.release-name.outputs.release }}:${{ steps.release-name.outputs.release }}
-      - name: git create and push tags
+      - name: git create and push tag
         run: |
           git branch -a
           git tag qa_${{ steps.release-name.outputs.date }}
@@ -56,12 +56,15 @@ jobs:
         id: git-diff
         run: |
           git log ${{ steps.release-name.outputs.release }}...${{ env.previous-release-branch }} --oneline > gitlog.txt
+          sed -i -e 's/^/* /' gitlog.txt
+          sed -i '1i## What's Changed\' gitlog.txt
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
         with:
           tag: qa_${{ steps.release-name.outputs.date }}
           name: qa_${{ steps.release-name.outputs.date }}
           bodyFile: gitlog.txt
+      # - name: Publish to Slack
 
       # - name: Initialize mandatory git config
       #   run: |
