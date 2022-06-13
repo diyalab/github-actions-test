@@ -51,19 +51,17 @@ jobs:
           git branch -a | grep remotes/origin/release- > branches.txt
           cat branches.txt
           echo "previous-release-branch=$(tail -2 branches.txt | head -1 | xargs )" >> $GITHUB_ENV
-          echo $previous-release-branch
+          echo ${{ env.previous-release-branch }}
       - name: get git diff between current and previous relese branches
         id: git-diff
         run: |
           git log ${{ steps.release-name.outputs.release }}...${{ env.previous-release-branch }} --oneline > gitlog.txt
-          echo "gitlog=$(cat gitlog.txt)" >> $GITHUB_ENV
-          echo ${{ env.gitlog }}
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
         with:
           tag: qa_${{ steps.release-name.outputs.date }}
           name: qa_${{ steps.release-name.outputs.date }}
-          body: ${{ env.gitlog }}
+          bodyFile: gitlog.txt
 
       # - name: Initialize mandatory git config
       #   run: |
