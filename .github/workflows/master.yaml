@@ -23,6 +23,7 @@ jobs:
         run: |
           date=`echo $(date '+%Y-%m-%d') | tr -d '-'`
           echo "::set-output name=release::release-$date"
+          echo "::set-output name=date::$date"
 
       - name: check-release-barnch-exists
         run: |
@@ -42,8 +43,14 @@ jobs:
       - name: git create and push tags
         run: |
           git branch -a
-          git tag v1.0.0
+          git tag qa_${{ steps.release-name.outputs.release }}
           git push --tags
+      - name: Create a GitHub release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: qa_${{ steps.release-name.outputs.release }}
+          name: Release qa_${{ steps.release-name.outputs.release }}
+          body: ${{ steps.tag_version.outputs.changelog }}
 
       # - name: Initialize mandatory git config
       #   run: |
