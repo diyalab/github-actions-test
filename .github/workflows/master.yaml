@@ -55,7 +55,7 @@ jobs:
       - name: get git diff between current and previous relese branches
         id: git-diff
         run: |
-          git log ${{ steps.release-name.outputs.release }}...$previous-release-branch --oneline > gitlog.txt
+          git log ${{ steps.release-name.outputs.release }}...${{ env.previous-release-branch }} --oneline > gitlog.txt
           gitlog=`cat gitlog.txt`
           echo "::set-output name=git-log::$gitlog"
       - name: Create a GitHub release
