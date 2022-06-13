@@ -43,7 +43,7 @@ jobs:
       - name: git create and push tags
         run: |
           git branch -a
-          git tag qa_${{ steps.release-name.outputs.release }}
+          git tag qa_${{ steps.release-name.outputs.date }}
           git push --tags
       - name: Get previous release branch name
         id: previous-release-branch
