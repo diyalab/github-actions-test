@@ -45,12 +45,24 @@ jobs:
           git branch -a
           git tag qa_${{ steps.release-name.outputs.release }}
           git push --tags
+      - name: Get previous release branch name
+        id: previous-release-branch
+        run: |
+          git branch -a | grep remotes/origin/release- > branches.txt
+          previous-release-branch=`tail -2 branches.txt | head -1 | xargs`
+          echo "::set-output name=branch::$previous-release-branch"
+      - name: get git diff between current and previous relese branches
+        id: git-diff
+        run: |
+          git log ${{ steps.release-name.outputs.release }}...${{ steps.previous-release-branch.outputs.branch }} --oneline > gitlog.txt
+          gitlog=`cat gitlog.txt`
+          echo "::set-output name=git-log::$gitlog"
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
         with:
-          tag: qa_${{ steps.release-name.outputs.release }}
-          name: Release qa_${{ steps.release-name.outputs.release }}
-          body: ${{ steps.tag_version.outputs.changelog }}
+          tag: qa_${{ steps.release-name.outputs.date }}
+          name: Release qa_${{ steps.release-name.outputs.date }}
+          body: ${{ steps.git-diff.outputs.git-log }}
 
       # - name: Initialize mandatory git config
       #   run: |
