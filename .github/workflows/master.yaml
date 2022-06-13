@@ -56,14 +56,13 @@ jobs:
         id: git-diff
         run: |
           git log ${{ steps.release-name.outputs.release }}...${{ env.previous-release-branch }} --oneline > gitlog.txt
-          gitlog=`cat gitlog.txt`
-          echo "::set-output name=git-log::$gitlog"
+          echo "gitlog=`cat gitlog.txt`" >> $GITHUB_ENV
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
         with:
           tag: qa_${{ steps.release-name.outputs.date }}
           name: qa_${{ steps.release-name.outputs.date }}
-          body: ${{ steps.git-diff.outputs.git-log }}
+          body: ${{ env.gitlog }}
 
       # - name: Initialize mandatory git config
       #   run: |
