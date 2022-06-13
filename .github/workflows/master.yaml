@@ -56,7 +56,7 @@ jobs:
         id: git-diff
         run: |
           git log ${{ steps.release-name.outputs.release }}...${{ env.previous-release-branch }} --oneline > gitlog.txt
-          sed -i -e 's/^/* /' gitlog.txt
+          sed -i "1 i\## What's new" gitlog.txt
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
         with:
