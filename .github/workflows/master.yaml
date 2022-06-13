@@ -56,7 +56,8 @@ jobs:
         id: git-diff
         run: |
           git log ${{ steps.release-name.outputs.release }}...${{ env.previous-release-branch }} --oneline > gitlog.txt
-          echo "gitlog=`cat gitlog.txt`" >> $GITHUB_ENV
+          echo "gitlog=$cat gitlog.txt)" >> $GITHUB_ENV
+          echo ${{ env.gitlog }}
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
         with:
