@@ -50,7 +50,7 @@ jobs:
         run: |
           git branch -a | grep remotes/origin/release- > branches.txt
           cat branches.txt
-          previous-release-branch=`tail -2 branches.txt | head -1 | xargs`
+          previous-release-branch=`tail -2 branches.txt | head -1`
           echo $previous-release-branch
       - name: get git diff between current and previous relese branches
         id: git-diff
