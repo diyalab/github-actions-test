@@ -16,7 +16,7 @@ jobs:
           date=`echo $(date '+%Y-%m-%d') | tr -d '-'`
           echo "::set-output name=release::release-$date"
           echo "::set-output name=date::$date"
-          echo "::set-output name:repo-name::$GITHUB_REPOSITORY"
+          echo "::set-output name=repo-name::$GITHUB_REPOSITORY"
 
       - name: check-release-barnch-exists
         run: |
