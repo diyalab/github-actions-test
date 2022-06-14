@@ -36,7 +36,10 @@ jobs:
         run: |
           echo $GITHUB_REF_NAME
           git branch -a
+          git checkout remotes/origin/main
+          git pull remotes/origin/main
+          git checkout $GITHUB_REF_NAME
           for i in $(echo ${{ inputs.commitIds }}| sed "s/,/ /g" )
           do
-              echo "$i"
+              it cherry-pick -x $i
           done
