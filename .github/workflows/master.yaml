@@ -1,14 +1,6 @@
 name: Create Release
 on:
   workflow_dispatch:
-    inputs:
-      name:
-        required: true
-        type: choice
-        description: Environment Name
-        options:
-          - QA
-          - PROD
 jobs:
   create-release:
     runs-on: ubuntu-latest
@@ -71,7 +63,7 @@ jobs:
           SLACK_CHANNEL: general
           SLACK_COLOR: ${{ job.status }}
           SLACK_ICON: https://github.com/rtCamp.png?size=48
-          SLACK_MESSAGE: "New release branch ${{ steps.release-name.outputs.release }} created and tagged with qa_${{ steps.release-name.outputs.date }} :rocket:"
+          SLACK_MESSAGE: "New release branch ${{ steps.release-name.outputs.release }} created and tagged with qa_${{ steps.release-name.outputs.date }}, https://github.com/diyalab/github-actions-test/releases/tag/qa_qa_${{ steps.release-name.outputs.date }} :rocket:"
           SLACK_TITLE: Create New Release
       # - name: Publish to Slack
 
