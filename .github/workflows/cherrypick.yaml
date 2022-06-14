@@ -39,5 +39,5 @@ jobs:
 
           for i in $(echo ${{ inputs.commitIds }}| sed "s/,/ /g" )
           do
-              it cherry-pick -x $i
+              git cherry-pick -x $i
           done
