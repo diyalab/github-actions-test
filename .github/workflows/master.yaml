@@ -48,6 +48,7 @@ jobs:
         id: git-diff
         run: |
           git log ${{ steps.release-name.outputs.release }}...${{ env.previous-release-branch }} --oneline > gitlog.txt
+          cp gitlog.txt gitlog_raw.txt
           sed -i -e 's/^/* /' gitlog.txt
           sed -i "1 i\## What's new" gitlog.txt
       - name: Create a GitHub release
@@ -82,7 +83,7 @@ jobs:
           echo "deployment_region=${{ env.REGION }}" >> $GITHUB_ENV
           echo "deploy_environment_display_name=${GITHUB_REPOSITORY} ${{ env.ENV}} ${{ env.REGION }}" >> $GITHUB_ENV
           echo "deploy_region=ALL" >> $GITHUB_ENV
-          echo "commit_message=echo -- $(<gitlog.txt);" >> $GITHUB_ENV
+          echo "commit_message=echo -- $(<gitlog_raw.txt);" >> $GITHUB_ENV
           echo "time_stamp=${{ env.TIME_STAMP }}" >> $GITHUB_ENV
       - name: Update Jira
         uses: fjogeleit/http-request-action@v1
