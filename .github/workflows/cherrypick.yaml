@@ -1,0 +1,43 @@
+name: Cherrypick
+on:
+  workflow_dispatch:
+    inputs:
+      Env:
+        description: "Environment to which cherrypicking"
+        required: true
+        default: "qa"
+        type: choice
+        options:
+          - qa
+          - prod
+      commitIds:
+        description: "Commit id's to cherrypick"
+        required: true
+        type: string
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      # - name: make release branch name
+      #   id: release-name
+      #   shell: bash
+      #   run: |
+      #     date=`echo $(date '+%Y-%m-%d') | tr -d '-'`
+      #     echo "::set-output name=release::release-$date"
+      #     echo "::set-output name=date::$date"
+      #     echo "::set-output name=repo-name::$GITHUB_REPOSITORY"
+      - name: echo
+        id: echo
+        shell: bash
+        run: |
+          echo $GITHUB_REF_NAME
+          git branch -a
+
+          for i in $(echo ${{ inputs.commitIds }}| sed "s/,/ /g" )
+          do
+              git cherry-pick -x $i
+          done
