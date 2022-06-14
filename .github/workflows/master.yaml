@@ -85,7 +85,7 @@ jobs:
           echo "deploy_environment_display_name=${GITHUB_REPOSITORY} ${{ env.ENV}} ${{ env.REGION }}" >> $GITHUB_ENV
           echo "deploy_region=ALL" >> $GITHUB_ENV
           echo "commit_message=$(cat gitlog_raw.txt | tr '\n' ' ')" >> $GITHUB_ENV
-          echo "time_stamp=${{ env.TIME_STAMP }}" >> $GITHUB_ENV
+          echo "time_stamp=$(date +"%Y-%m-%dT%H:%M:%S%z")" >> $GITHUB_ENV
       - name: Update Jira
         uses: fjogeleit/http-request-action@v1
         with:
@@ -94,7 +94,7 @@ jobs:
           customHeaders: '{"Content-Type": "application/json"}'
           username: adminuser
           password: oF0bBXMn
-          data: '{"commit_message": "${{ env.commit_message }}", "pipeline_url": "${{ env.pipeline_url }}", "pipeline_id": "${{ env.pipeline_id }}", "display_name": "${{ env.display_name }}", "commit_tag": "${{ env.commit_tag}}", "repo_url": "${{ env.repo_url}}", "repo_name": "${{ env.repo_name }}", "deploy_environment_type": "${{ env.deploy_environment_type}}", "deployment_region": "${{ env.deployment_region }}", "deploy_environment_display_name": "${{ env.deploy_environment_display_name }}", "deploy_region": "${{ env.deploy_region }}" }'
+          data: '{"commit_message": "${{ env.commit_message }}", "pipeline_url": "${{ env.pipeline_url }}", "pipeline_id": "${{ env.pipeline_id }}", "display_name": "${{ env.display_name }}", "commit_tag": "${{ env.commit_tag}}", "repo_url": "${{ env.repo_url}}", "repo_name": "${{ env.repo_name }}", "deploy_environment_type": "${{ env.deploy_environment_type}}", "deployment_region": "${{ env.deployment_region }}", "deploy_environment_display_name": "${{ env.deploy_environment_display_name }}", "deploy_region": "${{ env.deploy_region }}", "time_stamp": "${{ env.time_stamp1 }}" }'
       # - name: Publish to Slack
 
       # - name: Initialize mandatory git config
