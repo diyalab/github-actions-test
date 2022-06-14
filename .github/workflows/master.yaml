@@ -67,6 +67,10 @@ jobs:
           SLACK_TITLE: Create New Release
       - name: Generate data for jira submit
         shell: bash
+        env:
+          REGION: "ALL_REGIONS"
+          ENV: "QA"
+          DEPLOY_ENV_TYPE: "staging"
         run: |
           echo "pipeline_url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}/checks" >> $GITHUB_ENV
           echo "pipeline_id=${GITHUB_RUN_ID}" >> $GITHUB_ENV
@@ -76,7 +80,7 @@ jobs:
           echo "repo_name=${GITHUB_REPOSITORY}" >> $GITHUB_ENV
           echo "deploy_environment_type=${{ env.DEPLOY_ENV_TYPE }}" >> $GITHUB_ENV
           echo "deployment_region=${{ env.REGION }}" >> $GITHUB_ENV
-          echo "deploy_environment_display_name=${GITHUB_REPOSITORY} ${{ env.ENV}}+" "+${{ env.REGION }}" >> $GITHUB_ENV
+          echo "deploy_environment_display_name=${GITHUB_REPOSITORY} ${{ env.ENV}} ${{ env.REGION }}" >> $GITHUB_ENV
           echo "deploy_region=ALL" >> $GITHUB_ENV
       - name: Update Jira
         uses: fjogeleit/http-request-action@v1
