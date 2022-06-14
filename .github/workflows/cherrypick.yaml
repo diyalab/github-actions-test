@@ -36,3 +36,7 @@ jobs:
         run: |
           echo $GITHUB_REF_NAME
           git branch -a
+          for i in $(echo ${{ inputs.commitIds }}| sed "s/,/ /g" )
+          do
+              echo "$i"
+          done
