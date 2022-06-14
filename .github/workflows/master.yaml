@@ -83,7 +83,7 @@ jobs:
           echo "deployment_region=${{ env.REGION }}" >> $GITHUB_ENV
           echo "deploy_environment_display_name=${GITHUB_REPOSITORY} ${{ env.ENV}} ${{ env.REGION }}" >> $GITHUB_ENV
           echo "deploy_region=ALL" >> $GITHUB_ENV
-          echo "commit_message=$(cat gitlog_raw.txt)" >> $GITHUB_ENV
+          echo "commit_message=$(tr -d '\n' < gitlog_raw.txt)" >> $GITHUB_ENV
           echo "time_stamp=${{ env.TIME_STAMP }}" >> $GITHUB_ENV
       - name: Update Jira
         uses: fjogeleit/http-request-action@v1
