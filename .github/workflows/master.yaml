@@ -72,6 +72,7 @@ jobs:
           REGION: "ALL_REGIONS"
           ENV: "QA"
           DEPLOY_ENV_TYPE: "staging"
+          TIME_STAMP: ""
         run: |
           echo "pipeline_url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}/checks" >> $GITHUB_ENV
           echo "pipeline_id=${GITHUB_RUN_ID}" >> $GITHUB_ENV
@@ -83,7 +84,7 @@ jobs:
           echo "deployment_region=${{ env.REGION }}" >> $GITHUB_ENV
           echo "deploy_environment_display_name=${GITHUB_REPOSITORY} ${{ env.ENV}} ${{ env.REGION }}" >> $GITHUB_ENV
           echo "deploy_region=ALL" >> $GITHUB_ENV
-          echo "commit_message=$(tr -d '\n' < gitlog_raw.txt)" >> $GITHUB_ENV
+          echo "commit_message=$(echo gitlog_raw.txt | tr '\n' ' ')" >> $GITHUB_ENV
           echo "time_stamp=${{ env.TIME_STAMP }}" >> $GITHUB_ENV
       - name: Update Jira
         uses: fjogeleit/http-request-action@v1
@@ -93,7 +94,7 @@ jobs:
           customHeaders: '{"Content-Type": "application/json"}'
           username: adminuser
           password: oF0bBXMn
-          data: '{"commit_message": "${{ env.commit_message }}", "pipeline_url": "${{ env.pipeline_url }}", "pipeline_id": "${{ env.pipeline_id }}", "display_name": "${{ env.display_name }}", "commit_tag": "${{ env.commit_tag}}", "repo_url": "{{ env.repo_url}}", "repo_name": "${{ env.repo_name }}", "deploy_environment_type": "${{ env.deploy_environment_type}}", "deployment_region": "${{ env.deployment_region }}", "deploy_environment_display_name": "${{ env.deploy_environment_display_name }}", "deploy_region": "${{ env.deploy_region }}", "time_stamp": "${{ env.time_stamp }}" }'
+          data: '{"commit_message": "${{ env.commit_message }}", "pipeline_url": "${{ env.pipeline_url }}", "pipeline_id": "${{ env.pipeline_id }}", "display_name": "${{ env.display_name }}", "commit_tag": "${{ env.commit_tag}}", "repo_url": "${{ env.repo_url}}", "repo_name": "${{ env.repo_name }}", "deploy_environment_type": "${{ env.deploy_environment_type}}", "deployment_region": "${{ env.deployment_region }}", "deploy_environment_display_name": "${{ env.deploy_environment_display_name }}", "deploy_region": "${{ env.deploy_region }}", "time_stamp": ${{ env.time_stamp }} }'
       # - name: Publish to Slack
 
       # - name: Initialize mandatory git config
