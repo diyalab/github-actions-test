@@ -36,9 +36,7 @@ jobs:
         run: |
           echo $GITHUB_REF_NAME
           git branch -a
-          git switch -c main origin/main
-          git pull origin main
-          git switch $GITHUB_REF_NAME
+
           for i in $(echo ${{ inputs.commitIds }}| sed "s/,/ /g" )
           do
               it cherry-pick -x $i
