@@ -68,15 +68,15 @@ jobs:
       - name: Generate data for jira submit
         shell: bash
         run: |
-          echo "pipeline_url=$(${{ env.GITHUB_SERVER_URL}}+"/"+${{ env.GITHUB_REPOSITORY }}+ "/commit/" +${{ env.GITHUB_SHA }}+ "/checks")" >> $GITHUB_ENV
-          echo "pipeline_id=$(${{ env.GITHUB_RUN_ID }})" >> $GITHUB_ENV
-          echo "display_name=$(${{ env.GITHUB_REPOSITORY }}+ " " + ${{ env.GITHUB_REF_NAME }})" >> $GITHUB_ENV
-          echo "commit_tag=$(${{ env.GITHUB_REF_NAME }})" >> $GITHUB_ENV
-          echo "repo_url=$(${{ env.GITHUB_SERVER_URL}}+"/"+${{ env.GITHUB_REPOSITORY }})" >> $GITHUB_ENV
-          echo "repo_name=$(${{ env.GITHUB_REPOSITORY }})" >> $GITHUB_ENV
-          echo "deploy_environment_type=$(${{ env.DEPLOY_ENV_TYPE }})" >> $GITHUB_ENV
-          echo "deployment_region=$(${{ env.REGION }})" >> $GITHUB_ENV
-          echo "deploy_environment_display_name=$(${{ env.GITHUB_REPOSITORY }}+" "+${{ env.ENV}}+" "+${{ env.REGION }})" >> $GITHUB_ENV
+          echo "pipeline_url=${{ env.GITHUB_SERVER_URL}}+"/"+${{ env.GITHUB_REPOSITORY }}+ "/commit/" +${{ env.GITHUB_SHA }}+ "/checks"" >> $GITHUB_ENV
+          echo "pipeline_id=${{ env.GITHUB_RUN_ID }}" >> $GITHUB_ENV
+          echo "display_name=${{ env.GITHUB_REPOSITORY }}+ " " + ${{ env.GITHUB_REF_NAME }}" >> $GITHUB_ENV
+          echo "commit_tag=${{ env.GITHUB_REF_NAME }}" >> $GITHUB_ENV
+          echo "repo_url=${{ env.GITHUB_SERVER_URL}}+"/"+${{ env.GITHUB_REPOSITORY }}" >> $GITHUB_ENV
+          echo "repo_name=${{ env.GITHUB_REPOSITORY }}" >> $GITHUB_ENV
+          echo "deploy_environment_type=${{ env.DEPLOY_ENV_TYPE }}" >> $GITHUB_ENV
+          echo "deployment_region=${{ env.REGION }}" >> $GITHUB_ENV
+          echo "deploy_environment_display_name=${{ env.GITHUB_REPOSITORY }}+" "+${{ env.ENV}}+" "+${{ env.REGION }}" >> $GITHUB_ENV
           echo "deploy_region=ALL" >> $GITHUB_ENV
       - name: Update Jira
         uses: fjogeleit/http-request-action@v1
