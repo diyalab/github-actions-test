@@ -63,8 +63,30 @@ jobs:
           SLACK_CHANNEL: general
           SLACK_COLOR: ${{ job.status }}
           SLACK_ICON: https://github.com/rtCamp.png?size=48
-          SLACK_MESSAGE: "New release branch ${{ steps.release-name.outputs.release }} created and tagged with qa_${{ steps.release-name.outputs.date }}, https://github.com/diyalab/github-actions-test/releases/tag/qa_${{ steps.release-name.outputs.date }} :rocket:"
+          SLACK_MESSAGE: "New release branch ${{ steps.release-name.outputs.release }} created and tagged with qa_${{ steps.release-name.outputs.date }}, https://github.com/SpotDraft/django-rest-api/releases/tag/qa_${{ steps.release-name.outputs.date }} :rocket:"
           SLACK_TITLE: Create New Release
+      - name: Generate data for jira submit
+        shell: bash
+        run: |
+          echo "pipeline_url=$(${{ env.GITHUB_SERVER_URL}}+"/"+${{ env.GITHUB_REPOSITORY }}+ "/commit/" +${{ env.GITHUB_SHA }}+ "/checks")" >> $GITHUB_ENV
+          echo "pipeline_id=$(${{ env.GITHUB_RUN_ID }})" >> $GITHUB_ENV
+          echo "display_name=$(${{ env.GITHUB_REPOSITORY }}+ " " + ${{ env.GITHUB_REF_NAME }})" >> $GITHUB_ENV
+          echo "commit_tag=$(${{ env.GITHUB_REF_NAME }})" >> $GITHUB_ENV
+          echo "repo_url=$(${{ env.GITHUB_SERVER_URL}}+"/"+${{ env.GITHUB_REPOSITORY }})" >> $GITHUB_ENV
+          echo "repo_name=$(${{ env.GITHUB_REPOSITORY }})" >> $GITHUB_ENV
+          echo "deploy_environment_type=$(${{ env.DEPLOY_ENV_TYPE }})" >> $GITHUB_ENV
+          echo "deployment_region=$(${{ env.REGION }})" >> $GITHUB_ENV
+          echo "deploy_environment_display_name=$(${{ env.GITHUB_REPOSITORY }}+" "+${{ env.ENV}}+" "+${{ env.REGION }})" >> $GITHUB_ENV
+          echo "deploy_region=ALL" >> $GITHUB_ENV
+      - name: Update Jira
+        uses: fjogeleit/http-request-action@v1
+        env:
+          pipeline_url:
+        with:
+          url: ${{ secrets.JIRA_APP_URL }}
+          method: "POST"
+          customHeaders: '{"Content-Type": "application/json"}'
+          data: '{"commit_message": "value_1", "pipeline_url": "value_2"}'
       # - name: Publish to Slack
 
       # - name: Initialize mandatory git config
