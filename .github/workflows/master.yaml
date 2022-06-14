@@ -90,8 +90,7 @@ jobs:
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_CHANNEL: general
           SLACK_COLOR: ${{ job.status }}
           SLACK_ICON: https://github.com/rtCamp.png?size=48
-          SLACK_MESSAGE: "Release branch ${{ steps.release-name.outputs.release }} created and tagged with qa_${{ steps.release-name.outputs.date }}, https://github.com/${{ env.GITHUB_REPOSITORY }}/releases/tag/qa_${{ steps.release-name.outputs.date }} :rocket:"
-          SLACK_TITLE: New Release Created For ${{ env.GITHUB_REPOSITORY }}
+          SLACK_MESSAGE: "Release branch ${{ steps.release-name.outputs.release }} created and tagged with qa_${{ steps.release-name.outputs.date }}, https://github.com/$GITHUB_REPOSITORY/releases/tag/qa_${{ steps.release-name.outputs.date }} :rocket:"
+          SLACK_TITLE: New Release Created For $GITHUB_REPOSITORY
