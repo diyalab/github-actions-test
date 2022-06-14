@@ -57,15 +57,6 @@ jobs:
           tag: qa_${{ steps.release-name.outputs.date }}
           name: qa_${{ steps.release-name.outputs.date }}
           bodyFile: gitlog.txt
-      - name: Slack Notification
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_CHANNEL: general
-          SLACK_COLOR: ${{ job.status }}
-          SLACK_ICON: https://github.com/rtCamp.png?size=48
-          SLACK_MESSAGE: "New release branch ${{ steps.release-name.outputs.release }} created and tagged with qa_${{ steps.release-name.outputs.date }}, https://github.com/SpotDraft/django-rest-api/releases/tag/qa_${{ steps.release-name.outputs.date }} :rocket:"
-          SLACK_TITLE: Create New Release
       - name: Generate data for jira submit
         shell: bash
         env:
@@ -95,10 +86,12 @@ jobs:
           username: adminuser
           password: oF0bBXMn
           data: '{"commit_message": "${{ env.commit_message }}", "pipeline_url": "${{ env.pipeline_url }}", "pipeline_id": "${{ env.pipeline_id }}", "display_name": "${{ env.display_name }}", "commit_tag": "${{ env.commit_tag}}", "repo_url": "${{ env.repo_url}}", "repo_name": "${{ env.repo_name }}", "deploy_environment_type": "${{ env.deploy_environment_type}}", "deployment_region": "${{ env.deployment_region }}", "deploy_environment_display_name": "${{ env.deploy_environment_display_name }}", "deploy_region": "${{ env.deploy_region }}", "time_stamp": "${{ env.time_stamp1 }}", "time_stamp": "${{ env.time_stamp }}" }'
-      # - name: Publish to Slack
-
-      # - name: Initialize mandatory git config
-      #   run: |
-      #     git config user.name "GitHub Actions"
-      #     git config user.email noreply@github.com
-      # "time_stamp": ${{ env.time_stamp }}
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_CHANNEL: general
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_ICON: https://github.com/rtCamp.png?size=48
+          SLACK_MESSAGE: "New release branch ${{ steps.release-name.outputs.release }} created and tagged with qa_${{ steps.release-name.outputs.date }}, https://github.com/${GITHUB_REPOSITORY}/releases/tag/qa_${{ steps.release-name.outputs.date }} :rocket:"
+          SLACK_TITLE: New Release Created For ${GITHUB_REPOSITORY}
