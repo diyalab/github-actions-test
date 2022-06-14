@@ -37,3 +37,4 @@ jobs:
           echo $GITHUB_REF_NAME
           git branch -a
           echo $GITHUB_REF_NAME
+          echo $GITHUB_REF_NAME
