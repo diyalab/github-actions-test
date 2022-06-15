@@ -15,7 +15,7 @@ on:
         required: true
         type: string
 jobs:
-  create-release:
+  cherry-pick:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
