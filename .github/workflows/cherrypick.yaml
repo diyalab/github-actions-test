@@ -62,7 +62,7 @@ jobs:
                   f3=`cut -d'_' -f3 <<< $latest_tag` 
                   rc_number=`echo $f3 | grep -Eo '[0-9]+$'`
                   rc_number_new=$((rc_number+1))
-                  new_tag=$f1_$f2_RC$rc_number_new
+                  new_tag=${f1}_${f2}_RC${rc_number_new}
                   echo $new_tag
               fi
           fi
