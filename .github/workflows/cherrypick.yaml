@@ -39,10 +39,16 @@ jobs:
         shell: bash
         run: |
           echo $GITHUB_REF_NAME
+          release_date="$(cut -d'-' -f2 <<<"$GITHUB_REF_NAME")"
+          search_key=`qa_$GITHUB_REF_NAME`
+          git for-each-ref --sort=creatordate --format '%(refname) %(creatordate)' refs/tags | grep $search_key > tags.txt
+          latest_tag_with_datetime=`tail -1 tags.txt | xargs`
+          latest_tag_ref=`cut -d' ' -f1 <<<"$latest_tag_with_datetime"`
+          latest_tag=`cut -d'/' -f3 <<<"$latest_tag_ref`
           git branch -a
-          git describe --tags --abbrev=0 
-          for i in $(echo ${{ inputs.commitIds }}| sed "s/,/ /g" )
-          do
-              git cherry-pick -x $i
-          done
-          git push origin $GITHUB_REF_NAME
+          echo < $latest_tag
+      # for i in $(echo ${{ inputs.commitIds }}| sed "s/,/ /g" )
+      # do
+      #     git cherry-pick -x $i
+      # done
+      # git push origin $GITHUB_REF_NAME
