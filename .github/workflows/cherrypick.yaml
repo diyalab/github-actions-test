@@ -9,7 +9,6 @@ on:
         type: choice
         options:
           - qa
-          - prod
       commitIds:
         description: "Commit id's to cherrypick"
         required: true
@@ -26,14 +25,6 @@ jobs:
         run: |
           git config user.name "GitHub Actions"
           git config user.email noreply@github.com
-      # - name: make release branch name
-      #   id: release-name
-      #   shell: bash
-      #   run: |
-      #     date=`echo $(date '+%Y-%m-%d') | tr -d '-'`
-      #     echo "::set-output name=release::release-$date"
-      #     echo "::set-output name=date::$date"
-      #     echo "::set-output name=repo-name::$GITHUB_REPOSITORY"
       - name: validate Branch selected is in last two release branches
         shell: bash
         run: |
@@ -103,7 +94,7 @@ jobs:
           echo "pipeline_url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}/checks" >> $GITHUB_ENV
           echo "pipeline_id=${GITHUB_RUN_ID}" >> $GITHUB_ENV
           echo "display_name=${GITHUB_REPOSITORY} ${GITHUB_REF_NAME}" >> $GITHUB_ENV
-          echo "commit_tag=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+          echo "commit_tag=${{ steps.create-tag.outputs.new-tag }}" >> $GITHUB_ENV
           echo "repo_url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" >> $GITHUB_ENV
           echo "repo_name=${GITHUB_REPOSITORY}" >> $GITHUB_ENV
           echo "deploy_environment_type=${{ env.DEPLOY_ENV_TYPE }}" >> $GITHUB_ENV
@@ -113,8 +104,14 @@ jobs:
           echo "commit_message=$(cat gitlog_raw.txt | tr '\n' ' ')" >> $GITHUB_ENV
           echo "time_stamp=$(date +"%Y-%m-%dT%H:%M:%S%z")" >> $GITHUB_ENV
       - name: Update Jira
-        shell: bash
-        run: echo "siva"
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: ${{ secrets.JIRA_APP_URL }}
+          method: "POST"
+          customHeaders: '{"Content-Type": "application/json"}'
+          username: adminuser
+          password: oF0bBXMn
+          data: '{"commit_message": "${{ env.commit_message }}", "pipeline_url": "${{ env.pipeline_url }}", "pipeline_id": "${{ env.pipeline_id }}", "display_name": "${{ env.display_name }}", "commit_tag": "${{ env.commit_tag}}", "repo_url": "${{ env.repo_url}}", "repo_name": "${{ env.repo_name }}", "deploy_environment_type": "${{ env.deploy_environment_type}}", "deployment_region": "${{ env.deployment_region }}", "deploy_environment_display_name": "${{ env.deploy_environment_display_name }}", "deploy_region": "${{ env.deploy_region }}",  "time_stamp": "${{ env.time_stamp }}" }'
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2
         env:
