@@ -74,12 +74,44 @@ jobs:
           sed -i "1 i\## What's new" gitlog.txt
           cat gitlog.txt
           echo "::set-output name=new-tag::$new_tag"
+          echo "::set-output name=repo-name::$GITHUB_REPOSITORY"
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ steps.create-tag.outputs.new-tag }}
           name: ${{ steps.create-tag.outputs.new-tag }}
           bodyFile: gitlog.txt
+      - name: Generate data for jira submit
+        shell: bash
+        env:
+          REGION: "ALL_REGIONS"
+          ENV: "QA"
+          DEPLOY_ENV_TYPE: "staging"
+          TIME_STAMP: ""
+        run: |
+          echo "pipeline_url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}/checks" >> $GITHUB_ENV
+          echo "pipeline_id=${GITHUB_RUN_ID}" >> $GITHUB_ENV
+          echo "display_name=${GITHUB_REPOSITORY} ${GITHUB_REF_NAME}" >> $GITHUB_ENV
+          echo "commit_tag=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+          echo "repo_url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" >> $GITHUB_ENV
+          echo "repo_name=${GITHUB_REPOSITORY}" >> $GITHUB_ENV
+          echo "deploy_environment_type=${{ env.DEPLOY_ENV_TYPE }}" >> $GITHUB_ENV
+          echo "deployment_region=${{ env.REGION }}" >> $GITHUB_ENV
+          echo "deploy_environment_display_name=${GITHUB_REPOSITORY} ${{ env.ENV}} ${{ env.REGION }}" >> $GITHUB_ENV
+          echo "deploy_region=ALL" >> $GITHUB_ENV
+          echo "commit_message=$(cat gitlog_raw.txt | tr '\n' ' ')" >> $GITHUB_ENV
+          echo "time_stamp=$(date +"%Y-%m-%dT%H:%M:%S%z")" >> $GITHUB_ENV
+      - name: Update Jira
+        shell: bash
+        run: echo "siva"
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_ICON: https://github.com/rtCamp.png?size=48
+          SLACK_MESSAGE: "New tag ${{ steps.create-tag.outputs.new-tag }} created on  ${{ steps.create-tag.outputs.repo-name }} https://github.com/${{ steps.release-name.outputs.repo-name }}/releases/tag/${{ steps.create-tag.outputs.new-tag }} :rocket:"
+          SLACK_TITLE: New tag  ${{ steps.create-tag.outputs.new-tag }} created
 
       # for i in $(echo ${{ inputs.commitIds }}| sed "s/,/ /g" )
       # do
