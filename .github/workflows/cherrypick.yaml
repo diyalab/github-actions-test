@@ -1,0 +1,125 @@
+name: Cherrypick
+on:
+  workflow_dispatch:
+    inputs:
+      Env:
+        description: "Environment to which cherrypicking"
+        required: true
+        default: "qa"
+        type: choice
+        options:
+          - qa
+          - prod
+      commitIds:
+        description: "Commit id's to cherrypick"
+        required: true
+        type: string
+jobs:
+  cherry-pick:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Initialize mandatory git config
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email noreply@github.com
+      # - name: make release branch name
+      #   id: release-name
+      #   shell: bash
+      #   run: |
+      #     date=`echo $(date '+%Y-%m-%d') | tr -d '-'`
+      #     echo "::set-output name=release::release-$date"
+      #     echo "::set-output name=date::$date"
+      #     echo "::set-output name=repo-name::$GITHUB_REPOSITORY"
+      - name: validate Branch selected is in last two release branches
+        shell: bash
+        run: |
+          git branch -a | grep release- > branches.txt
+          tail -2 branches.txt | grep $GITHUB_REF_NAME
+      - name: create new tag
+        id: create-tag
+        shell: bash
+        run: |
+          echo $GITHUB_REF_NAME
+          release_date=`cut -d'-' -f2 <<< $GITHUB_REF_NAME`
+          search_key=qa_$release_date
+          git for-each-ref --sort=creatordate --format '%(refname) %(creatordate)' refs/tags | grep $search_key > tags.txt
+          latest_tag_with_datetime=`tail -1 tags.txt | xargs`
+          latest_tag_ref=`cut -d' ' -f1 <<< $latest_tag_with_datetime`
+          latest_tag=`cut -d'/' -f3 <<< $latest_tag_ref`
+          git branch -a
+          echo  $latest_tag
+          for i in $(echo ${{ inputs.commitIds }}| sed "s/,/ /g" )
+          do
+              git cherry-pick -x $i
+          done
+          git push origin $GITHUB_REF_NAME
+          count=`echo $latest_tag | grep -o "_" | wc -l`
+          if [ $count == 1 ]
+          then
+              echo "old tag is $latest_tag"
+              new_tag="${latest_tag}_RC1"
+              echo "new tag is $new_tag"
+          else 
+              if [ $count == 2 ]
+              then
+                  echo "old tag is $latest_tag"
+                  f1=`cut -d'_' -f1 <<< $latest_tag` 
+                  f2=`cut -d'_' -f2 <<< $latest_tag` 
+                  f3=`cut -d'_' -f3 <<< $latest_tag` 
+                  rc_number=`echo $f3 | grep -Eo '[0-9]+$'`
+                  rc_number_new=$((rc_number+1))
+                  new_tag=${f1}_${f2}_RC${rc_number_new}
+                  echo $new_tag
+              fi
+          fi
+          git tag $new_tag
+          git push --tags
+          git log $new_tag...$latest_tag --oneline > gitlog.txt
+          cp gitlog.txt gitlog_raw.txt
+          sed -i -e 's/^/* /' gitlog.txt
+          sed -i "1 i\## What's new" gitlog.txt
+          cat gitlog.txt
+          echo "::set-output name=new-tag::$new_tag"
+          echo "::set-output name=branch-name::$GITHUB_REF_NAME"
+          echo "::set-output name=repo-name::$GITHUB_REPOSITORY"
+      - name: Create a GitHub release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.create-tag.outputs.new-tag }}
+          name: ${{ steps.create-tag.outputs.new-tag }}
+          bodyFile: gitlog.txt
+      - name: Generate data for jira submit
+        shell: bash
+        env:
+          REGION: "ALL_REGIONS"
+          ENV: "QA"
+          DEPLOY_ENV_TYPE: "staging"
+          TIME_STAMP: ""
+        run: |
+          echo "pipeline_url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}/checks" >> $GITHUB_ENV
+          echo "pipeline_id=${GITHUB_RUN_ID}" >> $GITHUB_ENV
+          echo "display_name=${GITHUB_REPOSITORY} ${GITHUB_REF_NAME}" >> $GITHUB_ENV
+          echo "commit_tag=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+          echo "repo_url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" >> $GITHUB_ENV
+          echo "repo_name=${GITHUB_REPOSITORY}" >> $GITHUB_ENV
+          echo "deploy_environment_type=${{ env.DEPLOY_ENV_TYPE }}" >> $GITHUB_ENV
+          echo "deployment_region=${{ env.REGION }}" >> $GITHUB_ENV
+          echo "deploy_environment_display_name=${GITHUB_REPOSITORY} ${{ env.ENV}} ${{ env.REGION }}" >> $GITHUB_ENV
+          echo "deploy_region=ALL" >> $GITHUB_ENV
+          echo "commit_message=$(cat gitlog_raw.txt | tr '\n' ' ')" >> $GITHUB_ENV
+          echo "time_stamp=$(date +"%Y-%m-%dT%H:%M:%S%z")" >> $GITHUB_ENV
+      - name: Update Jira
+        shell: bash
+        run: echo "siva"
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_ICON: https://github.com/rtCamp.png?size=48
+          SLACK_MESSAGE: "New tag ${{ steps.create-tag.outputs.new-tag }} created on branch  ${{ steps.create-tag.outputs.branch-name }} in project ${{ steps.create-tag.outputs.repo-name }} https://github.com/${{ steps.release-name.outputs.repo-name }}/releases/tag/${{ steps.create-tag.outputs.new-tag }} :rocket:"
+          SLACK_TITLE: New tag  ${{ steps.create-tag.outputs.new-tag }} created
