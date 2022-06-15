@@ -43,10 +43,10 @@ jobs:
           search_key=qa_$release_date
           git for-each-ref --sort=creatordate --format '%(refname) %(creatordate)' refs/tags | grep $search_key > tags.txt
           latest_tag_with_datetime=`tail -1 tags.txt | xargs`
-          latest_tag_ref=`cut -d' ' -f1 <<<"$latest_tag_with_datetime"`
-          latest_tag=`cut -d'/' -f3 <<<"$latest_tag_ref`
+          latest_tag_ref=`cut -d' ' -f1 <<< $latest_tag_with_datetime`
+          latest_tag=`cut -d'/' -f3 <<< $latest_tag_ref`
           git branch -a
-          echo < $latest_tag
+          echo  $latest_tag
       # for i in $(echo ${{ inputs.commitIds }}| sed "s/,/ /g" )
       # do
       #     git cherry-pick -x $i
