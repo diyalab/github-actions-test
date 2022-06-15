@@ -66,6 +66,14 @@ jobs:
                   echo $new_tag
               fi
           fi
+          git tag $new_tag
+          git push --tags
+          git log $new_tag...$latest_tag --oneline > gitlog.txt
+          cp gitlog.txt gitlog_raw.txt
+          sed -i -e 's/^/* /' gitlog.txt
+          sed -i "1 i\## What's new" gitlog.txt
+          cat gitlog.txt
+
       # for i in $(echo ${{ inputs.commitIds }}| sed "s/,/ /g" )
       # do
       #     git cherry-pick -x $i
