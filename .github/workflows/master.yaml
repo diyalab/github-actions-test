@@ -17,6 +17,7 @@ jobs:
           echo "::set-output name=release::release-$date"
           echo "::set-output name=date::$date"
           echo "::set-output name=repo-name::$GITHUB_REPOSITORY"
+          echo "::set-output name=tag::qa_$date"
 
       - name: check-release-barnch-exists
         run: |
@@ -36,7 +37,7 @@ jobs:
       - name: git create and push tag
         run: |
           git branch -a
-          git tag qa_${{ steps.release-name.outputs.date }}
+          git tag ${{ steps.release-name.outputs.tag }}
           git push --tags
       - name: Get previous release branch name
         id: previous-release-branch
@@ -55,8 +56,8 @@ jobs:
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
         with:
-          tag: qa_${{ steps.release-name.outputs.date }}
-          name: qa_${{ steps.release-name.outputs.date }}
+          tag: ${{ steps.release-name.outputs.tag }}
+          name: ${{ steps.release-name.outputs.tag }}
           bodyFile: gitlog.txt
       - name: Generate data for jira submit
         shell: bash
@@ -93,5 +94,5 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_COLOR: ${{ job.status }}
           SLACK_ICON: https://github.com/rtCamp.png?size=48
-          SLACK_MESSAGE: "Release branch ${{ steps.release-name.outputs.release }} created and tagged with qa_${{ steps.release-name.outputs.date }}, https://github.com/${{ steps.release-name.outputs.repo-name }}/releases/tag/qa_${{ steps.release-name.outputs.date }} :rocket:"
+          SLACK_MESSAGE: "Release branch ${{ steps.release-name.outputs.release }} created and tagged with ${{ steps.release-name.outputs.tag }}, https://github.com/${{ steps.release-name.outputs.repo-name }}/releases/tag/${{ steps.release-name.outputs.tag }} :rocket:"
           SLACK_TITLE: New Release Created For ${{ steps.release-name.outputs.repo-name }}
