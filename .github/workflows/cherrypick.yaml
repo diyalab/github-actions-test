@@ -74,6 +74,7 @@ jobs:
           sed -i "1 i\## What's new" gitlog.txt
           cat gitlog.txt
           echo "::set-output name=new-tag::$new_tag"
+          echo "::set-output name=branch-name::$GITHUB_REF_NAME"
           echo "::set-output name=repo-name::$GITHUB_REPOSITORY"
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
@@ -110,7 +111,7 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_COLOR: ${{ job.status }}
           SLACK_ICON: https://github.com/rtCamp.png?size=48
-          SLACK_MESSAGE: "New tag ${{ steps.create-tag.outputs.new-tag }} created on  ${{ steps.create-tag.outputs.repo-name }} https://github.com/${{ steps.release-name.outputs.repo-name }}/releases/tag/${{ steps.create-tag.outputs.new-tag }} :rocket:"
+          SLACK_MESSAGE: "New tag ${{ steps.create-tag.outputs.new-tag }} created on branch  ${{ steps.create-tag.outputs.branch-name }} in project ${{ steps.create-tag.outputs.repo-name }} https://github.com/${{ steps.release-name.outputs.repo-name }}/releases/tag/${{ steps.create-tag.outputs.new-tag }} :rocket:"
           SLACK_TITLE: New tag  ${{ steps.create-tag.outputs.new-tag }} created
 
       # for i in $(echo ${{ inputs.commitIds }}| sed "s/,/ /g" )
