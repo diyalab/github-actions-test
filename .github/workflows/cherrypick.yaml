@@ -47,6 +47,25 @@ jobs:
           latest_tag=`cut -d'/' -f3 <<< $latest_tag_ref`
           git branch -a
           echo  $latest_tag
+          count=`echo $latest_tag | grep -o "_" | wc -l`
+          if [ $count == 1 ]
+          then
+              echo "old tag is $latest_tag"
+              new_tag=$tag"_"RC1
+              echo "new tag is $new_tag"
+          else 
+              if [ $count == 2 ]
+              then
+                  echo "old tag is $latest_tag"
+                  f1="$(cut -d'_' -f1 <<<"$latest_tag")"
+                  f2="$(cut -d'_' -f2 <<<"$latest_tag")"
+                  f3="$(cut -d'_' -f3 <<<"$latest_tag")"
+                  rc_number=`echo $f3 | grep -Eo '[0-9]+$'`
+                  rc_number_new=$((rc_number+1))
+                  new_tag=$f1"_"$f2"_"RC$rc_number_new
+                  echo $new_tag
+              fi
+          fi
       # for i in $(echo ${{ inputs.commitIds }}| sed "s/,/ /g" )
       # do
       #     git cherry-pick -x $i
