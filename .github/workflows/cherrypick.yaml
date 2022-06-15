@@ -47,6 +47,11 @@ jobs:
           latest_tag=`cut -d'/' -f3 <<< $latest_tag_ref`
           git branch -a
           echo  $latest_tag
+          for i in $(echo ${{ inputs.commitIds }}| sed "s/,/ /g" )
+          do
+              git cherry-pick -x $i
+          done
+          git push origin $GITHUB_REF_NAME
           count=`echo $latest_tag | grep -o "_" | wc -l`
           if [ $count == 1 ]
           then
@@ -113,9 +118,3 @@ jobs:
           SLACK_ICON: https://github.com/rtCamp.png?size=48
           SLACK_MESSAGE: "New tag ${{ steps.create-tag.outputs.new-tag }} created on branch  ${{ steps.create-tag.outputs.branch-name }} in project ${{ steps.create-tag.outputs.repo-name }} https://github.com/${{ steps.release-name.outputs.repo-name }}/releases/tag/${{ steps.create-tag.outputs.new-tag }} :rocket:"
           SLACK_TITLE: New tag  ${{ steps.create-tag.outputs.new-tag }} created
-
-      # for i in $(echo ${{ inputs.commitIds }}| sed "s/,/ /g" )
-      # do
-      #     git cherry-pick -x $i
-      # done
-      # git push origin $GITHUB_REF_NAME
