@@ -40,7 +40,7 @@ jobs:
         run: |
           echo $GITHUB_REF_NAME
           release_date=`cut -d'-' -f2 <<< $GITHUB_REF_NAME`
-          search_key=`qa_$release_date`
+          search_key=qa_$release_date
           git for-each-ref --sort=creatordate --format '%(refname) %(creatordate)' refs/tags | grep $search_key > tags.txt
           latest_tag_with_datetime=`tail -1 tags.txt | xargs`
           latest_tag_ref=`cut -d' ' -f1 <<<"$latest_tag_with_datetime"`
