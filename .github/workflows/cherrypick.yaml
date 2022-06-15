@@ -57,9 +57,9 @@ jobs:
               if [ $count == 2 ]
               then
                   echo "old tag is $latest_tag"
-                  f1="$(cut -d'_' -f1 <<<"$latest_tag")"
-                  f2="$(cut -d'_' -f2 <<<"$latest_tag")"
-                  f3="$(cut -d'_' -f3 <<<"$latest_tag")"
+                  f1=`cut -d'_' -f1 <<< $latest_tag` 
+                  f2=`cut -d'_' -f2 <<< $latest_tag` 
+                  f3=`cut -d'_' -f3 <<< $latest_tag` 
                   rc_number=`echo $f3 | grep -Eo '[0-9]+$'`
                   rc_number_new=$((rc_number+1))
                   new_tag=$f1_$f2_RC$rc_number_new
