@@ -51,7 +51,7 @@ jobs:
           if [ $count == 1 ]
           then
               echo "old tag is $latest_tag"
-              new_tag=$tag_RC1
+              new_tag="${tag}_RC1"
               echo "new tag is $new_tag"
           else 
               if [ $count == 2 ]
