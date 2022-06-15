@@ -34,6 +34,11 @@ jobs:
       #     echo "::set-output name=release::release-$date"
       #     echo "::set-output name=date::$date"
       #     echo "::set-output name=repo-name::$GITHUB_REPOSITORY"
+      - name: validate Branch selected is in last two release branches
+        shell: bash
+        run: |
+          git branch -a | grep release- > branches.txt
+          tail -2 branches.txt | grep $GITHUB_REF_NAME
       - name: create new tag
         id: create-tag
         shell: bash
