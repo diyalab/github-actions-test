@@ -34,8 +34,8 @@ jobs:
       #     echo "::set-output name=release::release-$date"
       #     echo "::set-output name=date::$date"
       #     echo "::set-output name=repo-name::$GITHUB_REPOSITORY"
-      - name: echo
-        id: echo
+      - name: create new tag
+        id: create-tag
         shell: bash
         run: |
           echo $GITHUB_REF_NAME
@@ -73,6 +73,13 @@ jobs:
           sed -i -e 's/^/* /' gitlog.txt
           sed -i "1 i\## What's new" gitlog.txt
           cat gitlog.txt
+          echo "::set-output name=new-tag::$new_tag"
+      - name: Create a GitHub release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.create-tag.outputs.new-tag }}
+          name: ${{ steps.create-tag.outputs.new-tag }}
+          bodyFile: gitlog.txt
 
       # for i in $(echo ${{ inputs.commitIds }}| sed "s/,/ /g" )
       # do
