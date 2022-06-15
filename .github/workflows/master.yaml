@@ -49,7 +49,7 @@ jobs:
       - name: get git diff between current and previous relese branches
         id: git-diff
         run: |
-          git log ${{ steps.release-name.outputs.release }}...${{ env.previous-release-branch }} --oneline > gitlog.txt
+          git log ${{ env.previous-release-branch }}...${{ steps.release-name.outputs.release }} --oneline > gitlog.txt
           cp gitlog.txt gitlog_raw.txt
           sed -i -e 's/^/* /' gitlog.txt
           sed -i "1 i\## What's new" gitlog.txt
