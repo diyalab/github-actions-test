@@ -115,7 +115,7 @@ jobs:
       #     data: '{"commit_message": "${{ env.commit_message }}", "pipeline_url": "${{ env.pipeline_url }}", "pipeline_id": "${{ env.pipeline_id }}", "display_name": "${{ env.display_name }}", "commit_tag": "${{ env.commit_tag}}", "repo_url": "${{ env.repo_url}}", "repo_name": "${{ env.repo_name }}", "deploy_environment_type": "${{ env.deploy_environment_type}}", "deployment_region": "${{ env.deployment_region }}", "deploy_environment_display_name": "${{ env.deploy_environment_display_name }}", "deploy_region": "${{ env.deploy_region }}",  "time_stamp": "${{ env.time_stamp }}" }'
       - name: Changelog
         id: changelog
-        uses: actions/jira-changelog@v1
+        uses: actions/jira-changelog@v1.1.4
         with:
           # jira_host: "myapp.atlassian.net"
           # jira_email: "jirauser@myapp.com"
