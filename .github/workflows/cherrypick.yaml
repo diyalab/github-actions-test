@@ -111,7 +111,7 @@ jobs:
         id: changelog
         uses: connorsmallman/github-jira-changelog-action@v1.1.4
         with:
-          jira_host: "https://siva273.atlassian.net"
+          jira_host: "siva273.atlassian.net"
           jira_email: "cvaganesh.v@gmail.com"
           jira_token: "KoyCR6kVSBBGwoeXYpPl07B3"
           jira_base_url: "https://siva273.atlassian.net"
