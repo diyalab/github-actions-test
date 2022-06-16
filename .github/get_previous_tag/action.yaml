@@ -54,7 +54,7 @@ runs:
             if [ $count == 2 ]
             then
                 environment=`cut -d'_' -f1 <<< $current_tag`
-                serarch_key=${environment}_${current_release_date}
+                search_key=${environment}_${current_release_date}
                 git for-each-ref --sort=creatordate --format '%(refname) %(creatordate)' refs/tags | grep $search_key > tags.txt
                 previous_tag_with_datetime=`tail -2 tags.txt | xargs`
                 previous_tag_ref=`cut -d' ' -f1 <<< $previous_tag_with_datetime`
