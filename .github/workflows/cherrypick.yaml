@@ -78,12 +78,6 @@ jobs:
           echo "::set-output name=old-tag::$latest_tag"
           echo "::set-output name=branch-name::$GITHUB_REF_NAME"
           echo "::set-output name=repo-name::$GITHUB_REPOSITORY"
-      - name: Create a GitHub release
-        uses: ncipollo/release-action@v1
-        with:
-          tag: ${{ steps.create-tag.outputs.new-tag }}
-          name: ${{ steps.create-tag.outputs.new-tag }}
-          bodyFile: gitlog.txt
       - name: Generate data for jira submit
         shell: bash
         env:
@@ -123,6 +117,12 @@ jobs:
           jira_base_url: "https://siva273.atlassian.net"
           source_control_range_from: ${{ steps.create-tag.outputs.old-tag }}
           source_control_range_to: ${{ steps.create-tag.outputs.new-tag }}
+      - name: Create a GitHub release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.create-tag.outputs.new-tag }}
+          name: ${{ steps.create-tag.outputs.new-tag }}
+          body: ${{ steps.changelog.outputs.changelog_message }}
       - name: Get the changelog message
         run: echo "${{ steps.changelog.outputs.changelog_message }}"
       - name: Slack Notification
