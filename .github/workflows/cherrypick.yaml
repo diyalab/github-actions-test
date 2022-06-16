@@ -75,7 +75,7 @@ jobs:
           sed -i "1 i\## What's new" gitlog.txt
           cat gitlog.txt
           echo "::set-output name=new-tag::$new_tag"
-          ech0 "::set-output name=old-tag::$latest_tag"
+          echo "::set-output name=old-tag::$latest_tag"
           echo "::set-output name=branch-name::$GITHUB_REF_NAME"
           echo "::set-output name=repo-name::$GITHUB_REPOSITORY"
       - name: Create a GitHub release
