@@ -21,4 +21,4 @@ jobs:
           release-branch: $GITHUB_REF_NAME
           qa-tag: ${{ inputs.qa-tag }}
       - name: echo
-        run: echo ${{ steps.previous-tag.outputs.previous_tag }}
+        run: echo ${{ steps.generate_new_tag.outputs.new_tag }}
