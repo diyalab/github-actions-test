@@ -96,14 +96,14 @@ jobs:
           jira_email: "cvaganesh.v@gmail.com"
           jira_token: "KoyCR6kVSBBGwoeXYpPl07B3"
           jira_base_url: "https://siva273.atlassian.net"
-          source_control_range_from: ${{ steps.create-tag.outputs.old-tag }}
-          source_control_range_to: ${{ steps.create-tag.outputs.new-tag }}
+          source_control_range_from: ${{ needs.generate-new-tag.outputs.previous_tag }}
+          source_control_range_to: ${{ needs.generate-new-tag.outputs.new_tag }}
           # jira_ticket_id_pattern: "TEST-"
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ steps.create-tag.outputs.new-tag }}
-          name: ${{ steps.create-tag.outputs.new-tag }}
+          tag: ${{ needs.generate-new-tag.outputs.new_tag }}
+          name: ${{ needs.generate-new-tag.outputs.new_tag }}
           body: ${{ steps.changelog.outputs.changelog_message }}
       - name: Get the changelog message
         run: echo "${{ steps.changelog.outputs.changelog_message }}"
@@ -115,4 +115,4 @@ jobs:
           SLACK_ICON: https://github.com/rtCamp.png?size=48
           SLACK_MESSAGE: ${{ steps.changelog.outputs.changelog_message }}
           # SLACK_MESSAGE: "New tag ${{ steps.create-tag.outputs.new-tag }} created on branch  ${{ steps.create-tag.outputs.branch-name }} in project ${{ steps.create-tag.outputs.repo-name }} https://github.com/${{ steps.release-name.outputs.repo-name }}/releases/tag/${{ steps.create-tag.outputs.new-tag }} :rocket:"
-          SLACK_TITLE: New tag  ${{ steps.create-tag.outputs.new-tag }} created
+          SLACK_TITLE: New tag  ${{ needs.generate-new-tag.outputs.new_tag }} created
