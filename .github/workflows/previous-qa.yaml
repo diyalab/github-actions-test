@@ -1,0 +1,24 @@
+name: Promote QA
+on:
+  workflow_dispatch:
+    inputs:
+      qa-tag:
+        description: "QA tag which has to promote to prod"
+        required: true
+        type: string
+jobs:
+  promote-qa-to-prod:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Generate New tag
+        uses: ./.github/generate_new_tag_prod
+        id: generate_new_tag
+        with:
+          release-branch: $GITHUB_REF_NAME
+          qa-tag: ${{ inputs.qa-tag }}
+      - name: echo
+        run: echo ${{ steps.generate_new_tag.outputs.previous_tag }}
