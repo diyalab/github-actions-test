@@ -113,7 +113,7 @@ jobs:
         with:
           jira_host: "https://siva273.atlassian.net"
           jira_email: "cvaganesh.v@gmail.com"
-          jira_token: "0TLhoYEp5PDeQMyBKzypv00BE"
+          jira_token: "KoyCR6kVSBBGwoeXYpPl07B3"
           jira_base_url: "https://siva273.atlassian.net"
           source_control_range_from: ${{ steps.create-tag.outputs.old-tag }}
           source_control_range_to: ${{ steps.create-tag.outputs.new-tag }}
