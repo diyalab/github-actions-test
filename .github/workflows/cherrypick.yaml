@@ -88,31 +88,27 @@ jobs:
       #     username: adminuser
       #     password: oF0bBXMn
       #     data: '{"commit_message": "${{ env.commit_message }}", "pipeline_url": "${{ env.pipeline_url }}", "pipeline_id": "${{ env.pipeline_id }}", "display_name": "${{ env.display_name }}", "commit_tag": "${{ env.commit_tag}}", "repo_url": "${{ env.repo_url}}", "repo_name": "${{ env.repo_name }}", "deploy_environment_type": "${{ env.deploy_environment_type}}", "deployment_region": "${{ env.deployment_region }}", "deploy_environment_display_name": "${{ env.deploy_environment_display_name }}", "deploy_region": "${{ env.deploy_region }}",  "time_stamp": "${{ env.time_stamp }}" }'
-      - name: Changelog
-        id: changelog
-        uses: connorsmallman/github-jira-changelog-action@v1.1.4
+      - name: Jira Changelog
+        id: jira-changelog
+        uses: ./.github/jira_changelog
         with:
-          jira_host: "siva273.atlassian.net"
-          jira_email: "cvaganesh.v@gmail.com"
-          jira_token: "KoyCR6kVSBBGwoeXYpPl07B3"
-          jira_base_url: "https://siva273.atlassian.net"
+          jira_host: ${{ secrets.JIRA_HOST }}
+          jira_email: ${{ secrets.JIRA_EMAIL }}
+          jira_token: ${{ secrets.JIRA_TOKEN }}
+          jira_base_url: ${{ secrets.JIRA_BASE_URL }}
           source_control_range_from: ${{ needs.generate-new-tag.outputs.previous_tag }}
           source_control_range_to: ${{ needs.generate-new-tag.outputs.new_tag }}
-          # jira_ticket_id_pattern: "TEST-"
       - name: Create a GitHub release
-        uses: ncipollo/release-action@v1
+        id: github_release
+        uses: ./.github/github_release
         with:
           tag: ${{ needs.generate-new-tag.outputs.new_tag }}
-          name: ${{ needs.generate-new-tag.outputs.new_tag }}
-          body: ${{ steps.changelog.outputs.changelog_message }}
-      - name: Get the changelog message
-        run: echo "${{ steps.changelog.outputs.changelog_message }}"
+          changelog_message: ${{ steps.jira-changelog.outputs.changelog_message }}
       - name: Slack Notification
-        uses: rtCamp/action-slack-notify@v2
+        uses: ./.github/slack_message
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_COLOR: ${{ job.status }}
           SLACK_ICON: https://github.com/rtCamp.png?size=48
-          SLACK_MESSAGE: ${{ steps.changelog.outputs.changelog_message }}
-          # SLACK_MESSAGE: "New tag ${{ steps.create-tag.outputs.new-tag }} created on branch  ${{ steps.create-tag.outputs.branch-name }} in project ${{ steps.create-tag.outputs.repo-name }} https://github.com/${{ steps.release-name.outputs.repo-name }}/releases/tag/${{ steps.create-tag.outputs.new-tag }} :rocket:"
+          SLACK_MESSAGE: ${{ steps.jira-changelog.outputs.changelog_message }}
           SLACK_TITLE: New tag  ${{ needs.generate-new-tag.outputs.new_tag }} created
