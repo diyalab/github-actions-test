@@ -16,3 +16,4 @@ RUN wget -O /kaniko/jq \
     https://github.com/google/go-containerregistry/releases/download/v0.1.1/go-containerregistry_Linux_x86_64.tar.gz && \
     tar -xvzf /crane.tar.gz crane -C /kaniko && \
     rm /crane.tar.gz
+#RUN
