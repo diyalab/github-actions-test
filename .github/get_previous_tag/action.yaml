@@ -42,7 +42,6 @@ runs:
         count=`echo $current_tag | grep -o "_" | wc -l`
         if [ $count == 1 ]
         then
-            echo "in loop"
             environment=`cut -d'_' -f1 <<< $current_tag`
             search_key=${environment}_${previous_release_date}
             echo $search_key

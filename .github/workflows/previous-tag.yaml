@@ -13,6 +13,6 @@ jobs:
         id: previous-tag
         uses: ./.github/get_previous_tag
         with:
-          tag: qa_20220615
+          tag: qa_20220614_RC27
       - name: echo
         run: echo ${{ steps.previous-tag.outputs.previous_tag }}
