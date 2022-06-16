@@ -47,7 +47,7 @@ jobs:
         run: |
           git branch -a | grep release- > branches.txt
           tail -2 branches.txt | grep $GITHUB_REF_NAME
-      - name: create new tag
+      - name: create and push new tag
         id: create-tag
         shell: bash
         run: |
@@ -58,7 +58,7 @@ jobs:
           git push origin $GITHUB_REF_NAME
           git tag ${{ needs.generate-new-tag.outputs.new_tag }}
           git push --tags
-          echo "VERSION=$new_tag" >> $GITHUB_ENV
+          echo "VERSION=${{ needs.generate-new-tag.outputs.new_tag }}" >> $GITHUB_ENV
       # - name: Generate data for jira submit
       #   shell: bash
       #   env:
