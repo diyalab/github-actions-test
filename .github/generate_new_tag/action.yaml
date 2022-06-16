@@ -26,6 +26,7 @@ runs:
       id: generate-tag
       shell: bash
       run: |
+        export TERM=xterm-color
         echo ${{ inputs.release-branch }}
         release_date=`cut -d'-' -f2 <<< ${{ inputs.release-branch }}`
         search_key=${{ inputs.environment }}_$release_date
@@ -53,6 +54,6 @@ runs:
                 echo $new_tag
             fi
         fi
-        echo $new_tag
+        echo "new tag is $new_tag"
         echo "::set-output name=new_tag::$new_tag"
         echo "::set-output name=previous_tag::$current_latest_tag"
