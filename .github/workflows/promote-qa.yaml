@@ -1,4 +1,4 @@
-name: Cherrypick
+name: Promote QA
 on:
   workflow_dispatch:
     inputs:
@@ -14,10 +14,11 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: get previous tag
-        id: previous-tag
-        uses: ./.github/get_previous_tag
+      - name: Generate New tag
+        uses: ./.github/generate_new_tag_prod
+        id: generate_new_tag
         with:
-          tag: ${{ inputs.qa-tag }}
+          release-branch: $GITHUB_REF_NAME
+          qa-tag: ${{ inputs.qa-tag }}
       - name: echo
         run: echo ${{ steps.previous-tag.outputs.previous_tag }}
