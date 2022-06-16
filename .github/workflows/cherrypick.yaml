@@ -14,7 +14,24 @@ on:
         required: true
         type: string
 jobs:
+  generate-new-tag:
+    runs-on: ubuntu-latest
+    outputs:
+      new_tag: ${{ steps.generate_new_tag.outputs.new_tag }}
+      previous_tag: ${{ steps.generate_new_tag.outputs.previous_tag }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Generate New tag
+        uses: ./.github/generate_new_tag
+        id: generate_new_tag
+        with:
+          release-branch: $GITHUB_REF_NAME
+          environment: ${{ inputs.Env }}
   cherry-pick:
+    needs: generate-new-tag
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
@@ -34,50 +51,13 @@ jobs:
         id: create-tag
         shell: bash
         run: |
-          echo $GITHUB_REF_NAME
-          release_date=`cut -d'-' -f2 <<< $GITHUB_REF_NAME`
-          search_key=qa_$release_date
-          git for-each-ref --sort=creatordate --format '%(refname) %(creatordate)' refs/tags | grep $search_key > tags.txt
-          latest_tag_with_datetime=`tail -1 tags.txt | xargs`
-          latest_tag_ref=`cut -d' ' -f1 <<< $latest_tag_with_datetime`
-          latest_tag=`cut -d'/' -f3 <<< $latest_tag_ref`
-          git branch -a
-          echo  $latest_tag
           for i in $(echo ${{ inputs.commitIds }}| sed "s/,/ /g" )
           do
               git cherry-pick -x $i
           done
           git push origin $GITHUB_REF_NAME
-          count=`echo $latest_tag | grep -o "_" | wc -l`
-          if [ $count == 1 ]
-          then
-              echo "old tag is $latest_tag"
-              new_tag="${latest_tag}_RC1"
-              echo "new tag is $new_tag"
-          else 
-              if [ $count == 2 ]
-              then
-                  echo "old tag is $latest_tag"
-                  f1=`cut -d'_' -f1 <<< $latest_tag` 
-                  f2=`cut -d'_' -f2 <<< $latest_tag` 
-                  f3=`cut -d'_' -f3 <<< $latest_tag` 
-                  rc_number=`echo $f3 | grep -Eo '[0-9]+$'`
-                  rc_number_new=$((rc_number+1))
-                  new_tag=${f1}_${f2}_RC${rc_number_new}
-                  echo $new_tag
-              fi
-          fi
-          git tag $new_tag
+          git tag ${{ needs.generate-new-tag.outputs.new_tag }}
           git push --tags
-          git log $new_tag...$latest_tag --oneline > gitlog.txt
-          cp gitlog.txt gitlog_raw.txt
-          sed -i -e 's/^/* /' gitlog.txt
-          sed -i "1 i\## What's new" gitlog.txt
-          cat gitlog.txt
-          echo "::set-output name=new-tag::$new_tag"
-          echo "::set-output name=old-tag::$latest_tag"
-          echo "::set-output name=branch-name::$GITHUB_REF_NAME"
-          echo "::set-output name=repo-name::$GITHUB_REPOSITORY"
           echo "VERSION=$new_tag" >> $GITHUB_ENV
       - name: Generate data for jira submit
         shell: bash
