@@ -1,0 +1,23 @@
+name: Cherrypick
+on:
+  workflow_dispatch:
+    inputs:
+      qa-tag:
+        description: "QA tag which has to promote to prod"
+        required: true
+        type: string
+jobs:
+  promote-qa-to-prod:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: get previous tag
+        id: previous-tag
+        uses: ./.github/get_previous_tag
+        with:
+          tag: ${{ inputs.qa-tag }}
+      - name: echo
+        run: echo ${{ steps.previous-tag.outputs.previous_tag }}
