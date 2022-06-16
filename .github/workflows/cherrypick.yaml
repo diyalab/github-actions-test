@@ -117,7 +117,7 @@ jobs:
           jira_base_url: "https://siva273.atlassian.net"
           source_control_range_from: ${{ steps.create-tag.outputs.old-tag }}
           source_control_range_to: ${{ steps.create-tag.outputs.new-tag }}
-          jira_ticket_id_pattern: /TEST-\w*/g
+          # jira_ticket_id_pattern: /TEST-\w*/g
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
         with:
