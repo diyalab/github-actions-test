@@ -75,6 +75,7 @@ jobs:
           sed -i "1 i\## What's new" gitlog.txt
           cat gitlog.txt
           echo "::set-output name=new-tag::$new_tag"
+          ech0 "::set-output name=old-tag::$latest_tag"
           echo "::set-output name=branch-name::$GITHUB_REF_NAME"
           echo "::set-output name=repo-name::$GITHUB_REPOSITORY"
       - name: Create a GitHub release
@@ -116,12 +117,12 @@ jobs:
         id: changelog
         uses: actions/jira-changelog@v1
         with:
-          jira_host: "myapp.atlassian.net"
-          jira_email: "jirauser@myapp.com"
-          jira_token: "qWoJBdlEp6pJy15fc9tGpsOOR2L5i35v"
-          jira_base_url: "https://yoursite.atlassian.net"
-          source_control_range_from: "develop"
-          source_control_range_to: "master"
+          # jira_host: "myapp.atlassian.net"
+          # jira_email: "jirauser@myapp.com"
+          # jira_token: "qWoJBdlEp6pJy15fc9tGpsOOR2L5i35v"
+          # jira_base_url: "https://yoursite.atlassian.net"
+          source_control_range_from: ${{ steps.create-tag.outputs.old-tag }}
+          source_control_range_to: ${{ steps.create-tag.outputs.new-tag }}
       - name: Get the changelog message
         run: echo "${{ steps.changelog.outputs.changelog_message }}"
       - name: Slack Notification
