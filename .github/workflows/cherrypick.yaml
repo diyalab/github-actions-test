@@ -59,26 +59,26 @@ jobs:
           git tag ${{ needs.generate-new-tag.outputs.new_tag }}
           git push --tags
           echo "VERSION=$new_tag" >> $GITHUB_ENV
-      - name: Generate data for jira submit
-        shell: bash
-        env:
-          REGION: "ALL_REGIONS"
-          ENV: "QA"
-          DEPLOY_ENV_TYPE: "staging"
-          TIME_STAMP: ""
-        run: |
-          echo "pipeline_url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}/checks" >> $GITHUB_ENV
-          echo "pipeline_id=${GITHUB_RUN_ID}" >> $GITHUB_ENV
-          echo "display_name=${GITHUB_REPOSITORY} ${GITHUB_REF_NAME}" >> $GITHUB_ENV
-          echo "commit_tag=${{ steps.create-tag.outputs.new-tag }}" >> $GITHUB_ENV
-          echo "repo_url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" >> $GITHUB_ENV
-          echo "repo_name=${GITHUB_REPOSITORY}" >> $GITHUB_ENV
-          echo "deploy_environment_type=${{ env.DEPLOY_ENV_TYPE }}" >> $GITHUB_ENV
-          echo "deployment_region=${{ env.REGION }}" >> $GITHUB_ENV
-          echo "deploy_environment_display_name=${GITHUB_REPOSITORY} ${{ env.ENV}} ${{ env.REGION }}" >> $GITHUB_ENV
-          echo "deploy_region=ALL" >> $GITHUB_ENV
-          echo "commit_message=$(cat gitlog_raw.txt | tr '\n' ' ')" >> $GITHUB_ENV
-          echo "time_stamp=$(date +"%Y-%m-%dT%H:%M:%S%z")" >> $GITHUB_ENV
+      # - name: Generate data for jira submit
+      #   shell: bash
+      #   env:
+      #     REGION: "ALL_REGIONS"
+      #     ENV: "QA"
+      #     DEPLOY_ENV_TYPE: "staging"
+      #     TIME_STAMP: ""
+      #   run: |
+      #     echo "pipeline_url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}/checks" >> $GITHUB_ENV
+      #     echo "pipeline_id=${GITHUB_RUN_ID}" >> $GITHUB_ENV
+      #     echo "display_name=${GITHUB_REPOSITORY} ${GITHUB_REF_NAME}" >> $GITHUB_ENV
+      #     echo "commit_tag=${{ steps.create-tag.outputs.new-tag }}" >> $GITHUB_ENV
+      #     echo "repo_url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" >> $GITHUB_ENV
+      #     echo "repo_name=${GITHUB_REPOSITORY}" >> $GITHUB_ENV
+      #     echo "deploy_environment_type=${{ env.DEPLOY_ENV_TYPE }}" >> $GITHUB_ENV
+      #     echo "deployment_region=${{ env.REGION }}" >> $GITHUB_ENV
+      #     echo "deploy_environment_display_name=${GITHUB_REPOSITORY} ${{ env.ENV}} ${{ env.REGION }}" >> $GITHUB_ENV
+      #     echo "deploy_region=ALL" >> $GITHUB_ENV
+      #     echo "commit_message=$(cat gitlog_raw.txt | tr '\n' ' ')" >> $GITHUB_ENV
+      #     echo "time_stamp=$(date +"%Y-%m-%dT%H:%M:%S%z")" >> $GITHUB_ENV
       # - name: Update Jira
       #   uses: fjogeleit/http-request-action@v1
       #   with:
