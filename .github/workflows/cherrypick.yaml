@@ -78,6 +78,7 @@ jobs:
           echo "::set-output name=old-tag::$latest_tag"
           echo "::set-output name=branch-name::$GITHUB_REF_NAME"
           echo "::set-output name=repo-name::$GITHUB_REPOSITORY"
+          echo "VERSION=$new_tag" >> $GITHUB_ENV
       - name: Generate data for jira submit
         shell: bash
         env:
