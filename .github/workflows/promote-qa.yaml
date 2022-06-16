@@ -1,0 +1,8 @@
+name: Cherrypick
+on:
+  workflow_dispatch:
+    inputs:
+      qa-tag:
+        description: "QA tag which has to promote to prod"
+        required: true
+        type: string
