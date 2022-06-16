@@ -20,11 +20,11 @@ runs:
         echo"Current Tag: $current_tag"
         release_date=`cut -d'-' -f2 <<< ${{ inputs.current_tag }}`
         current_release_branch=release-$release_date
-        echo"Current release branch: $current_release_branch"
+        echo "Current release branch: $current_release_branch"
         git branch -r  | grep release | grep -vE $current_release_branch > remote-branches.txt
         previous_release_branch=`tail -1 remote-branches.txt | xargs`
         previous_release_date=`cut -d'-' -f2 <<< $previous_release_branch`
-        echo"Previous release branch: $previous_release_branch"
+        echo "Previous release branch: $previous_release_branch"
         count=`echo $current_tag | grep -o "_" | wc -l`
         if [ $count == 1 ]
         then
