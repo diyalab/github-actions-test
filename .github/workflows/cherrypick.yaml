@@ -117,10 +117,10 @@ jobs:
         id: changelog
         uses: connorsmallman/github-jira-changelog-action@v1.1.4
         with:
-          # jira_host: "myapp.atlassian.net"
-          # jira_email: "jirauser@myapp.com"
-          # jira_token: "qWoJBdlEp6pJy15fc9tGpsOOR2L5i35v"
-          # jira_base_url: "https://yoursite.atlassian.net"
+          jira_host: "https://siva273.atlassian.net"
+          jira_email: "cvaganesh.v@gmail.com"
+          jira_token: "0TLhoYEp5PDeQMyBKzypv00BE"
+          jira_base_url: "https://siva273.atlassian.net"
           source_control_range_from: ${{ steps.create-tag.outputs.old-tag }}
           source_control_range_to: ${{ steps.create-tag.outputs.new-tag }}
       - name: Get the changelog message
