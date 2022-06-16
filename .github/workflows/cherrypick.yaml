@@ -106,7 +106,7 @@ jobs:
           changelog_message: ${{ steps.jira-changelog.outputs.changelog_message }}
       - name: Slack Notification
         uses: ./.github/slack_message
-        env:
+        with:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_COLOR: ${{ job.status }}
           SLACK_ICON: https://github.com/rtCamp.png?size=48
