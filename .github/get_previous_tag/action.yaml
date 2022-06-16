@@ -31,6 +31,7 @@ runs:
             echo "in loop"
             environment=`cut -d'_' -f1 <<< $current_tag`
             serarch_key=${environment}_${previous_release_date}
+            echo $search_key
             git for-each-ref --sort=creatordate --format '%(refname) %(creatordate)' refs/tags | grep $search_key > tags.txt
             previous_tag_with_datetime=`tail -1 tags.txt | xargs`
             previous_tag_ref=`cut -d' ' -f1 <<< $previous_tag_with_datetime`
