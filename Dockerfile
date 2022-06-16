@@ -17,3 +17,4 @@ RUN wget -O /kaniko/jq \
     tar -xvzf /crane.tar.gz crane -C /kaniko && \
     rm /crane.tar.gz
 #RUN
+#RUN
