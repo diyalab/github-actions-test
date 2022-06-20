@@ -110,7 +110,7 @@ jobs:
         with:
           commit-message: ${{ steps.jira-changelog.outputs.changelog_message }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Push Deployment Info to Jira
         if: steps.jira_keys.outputs.jira-keys != ''
         id: push_deployment_info_to_jira
