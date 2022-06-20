@@ -104,6 +104,36 @@ jobs:
         with:
           tag: ${{ needs.generate-new-tag.outputs.new_tag }}
           changelog_message: ${{ steps.jira-changelog.outputs.changelog_message }}
+      - name: Parse Jira Keys from changelog
+        iid: jira_keys
+        uses: HighwayThree/jira-extract-issue-keys@v0.3-alpha
+        with:
+          commit-message: ${{ steps.jira-changelog.outputs.changelog_message }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }
+      - name: Push Deployment Info to Jira
+        if: steps.jira_keys.outputs.jira-keys != ''
+        id: push_deployment_info_to_jira
+        uses: HighwayThree/jira-upload-deployment-info@v0.1-alpha
+        with:
+          cloud-id: '${{ secrets.CLOUD_ID }}'
+          client-id: '${{ secrets.CLIENT_ID }}'
+          client-secret: '${{ secrets.CLIENT_SECRET }}'
+          deployment-sequence-number: '${{ github.run_id }}'
+          update-sequence-number: '${{ github.run_id }}'
+          issue-keys: "${{ steps.jira_keys.outputs.jira-keys }}"
+          display-name: "django-rest-api ${{ needs.generate-new-tag.outputs.new_tag }} "
+          url: "${{github.event.repository.url}}/releases/tag/${{ needs.generate-new-tag.outputs.new_tag }}"
+          description: "django-rest-api ${{ needs.generate-new-tag.outputs.new_tag }} "
+          last-updated: '${{github.event.head_commit.timestamp}}'
+          # label: 'Test Deployment Label'
+          state: 'successful'
+          pipeline-id: '${{ github.repository }} ${{ github.workflow }}'
+          pipeline-display-name: 'Workflow: ${{ github.workflow }} (#${{ github.run_number }})'
+          pipeline-url: '${{github.event.repository.url}}/actions/runs/${{github.run_id}}'
+          environment-id: 'QA'
+          environment-display-name: 'django-rest-api QA ALL_REGIONS'
+          environment-type: 'staging'
       - name: Slack Notification
         uses: ./.github/slack_message
         with:
