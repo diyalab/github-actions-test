@@ -139,6 +139,6 @@ jobs:
         with:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_COLOR: ${{ job.status }}
-          SLACK_ICON: https://github.com/rtCamp.png?size=48
+          SLACK_ICON: https://cdn.spotdraft.com/devops/rocket-launch.jpeg
           SLACK_MESSAGE: ${{ steps.jira-changelog.outputs.changelog_message }}
-          SLACK_TITLE: New tag  ${{ needs.generate-new-tag.outputs.new_tag }} created
+          SLACK_TITLE: New tag  ${{ needs.generate-new-tag.outputs.new_tag }} created on ${{ github.repository }}
