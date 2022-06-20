@@ -142,3 +142,4 @@ jobs:
           SLACK_ICON: https://cdn.spotdraft.com/devops/rocket-launch.jpeg
           SLACK_MESSAGE: ${{ steps.jira-changelog.outputs.changelog_message }}
           SLACK_TITLE: New tag  ${{ needs.generate-new-tag.outputs.new_tag }} created on ${{ github.repository }}
+          SLACK_USERNAME: Github-Actions

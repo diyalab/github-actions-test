@@ -13,6 +13,9 @@ inputs:
   SLACK_TITLE:
     required: true
     description: "Slack Message Title"
+  SLACK_USERNAME:
+    required: true
+    description: "user name"
 runs:
   using: "composite"
   steps:
@@ -24,3 +27,4 @@ runs:
         SLACK_ICON: ${{ inputs.SLACK_ICON }}
         SLACK_MESSAGE: ${{ inputs.SLACK_MESSAGE }}
         SLACK_TITLE: ${{ inputs.SLACK_TITLE }}
+        SLACK_USERNAME: ${{ inputs.SLACK_USERNAME }}
