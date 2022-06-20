@@ -123,14 +123,14 @@ jobs:
           update-sequence-number: '${{ github.run_id }}'
           issue-keys: "${{ steps.jira_keys.outputs.jira-keys }}"
           display-name: "django-rest-api ${{ needs.generate-new-tag.outputs.new_tag }} "
-          url: "${{github.event.repository.url}}/releases/tag/${{ needs.generate-new-tag.outputs.new_tag }}"
+          url: "https://github.com/${GITHUB_REPOSITORY}/releases/tag/${{ needs.generate-new-tag.outputs.new_tag }}"
           description: "django-rest-api ${{ needs.generate-new-tag.outputs.new_tag }} "
           last-updated: '${{github.event.head_commit.timestamp}}'
           # label: 'Test Deployment Label'
           state: 'successful'
           pipeline-id: '${{ github.repository }} ${{ github.workflow }}'
           pipeline-display-name: 'Workflow: ${{ github.workflow }} (#${{ github.run_number }})'
-          pipeline-url: '${{github.event.repository.url}}/actions/runs/${{github.run_id}}'
+          pipeline-url: 'https://github.com/${GITHUB_REPOSITORY}/actions/runs/${{github.run_id}}'
           environment-id: 'QA'
           environment-display-name: 'django-rest-api QA ALL_REGIONS'
           environment-type: 'staging'
