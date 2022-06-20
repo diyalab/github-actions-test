@@ -105,7 +105,7 @@ jobs:
           tag: ${{ needs.generate-new-tag.outputs.new_tag }}
           changelog_message: ${{ steps.jira-changelog.outputs.changelog_message }}
       - name: Parse Jira Keys from changelog
-        iid: jira_keys
+        id: jira_keys
         uses: HighwayThree/jira-extract-issue-keys@v0.3-alpha
         with:
           commit-message: ${{ steps.jira-changelog.outputs.changelog_message }}
