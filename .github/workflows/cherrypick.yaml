@@ -116,7 +116,7 @@ jobs:
         id: push_deployment_info_to_jira
         uses: HighwayThree/jira-upload-deployment-info@v0.1-alpha
         with:
-          cloud-id: '${{ secrets.CLOUD_ID }}'
+          cloud-instance-base-url: 'https://example.atlassian.net'
           client-id: '${{ secrets.CLIENT_ID }}'
           client-secret: '${{ secrets.CLIENT_SECRET }}'
           deployment-sequence-number: '${{ github.run_id }}'
