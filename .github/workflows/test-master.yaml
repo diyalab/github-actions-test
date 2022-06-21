@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v1
       - name: Changelog
         id: changelog
-        uses: actions/jira-changelog@v1
+        uses: connorsmallman/github-jira-changelog-action@v1.1.4
         with:
           jira_host: 'siva273.atlassian.net'
           jira_email: 'cvaganesh.v@gmail.com'
