@@ -23,8 +23,8 @@ jobs:
           jira_email: 'cvaganesh.v@gmail.com'
           jira_token: ${{ secrets.JIRA_TOKEN }}
           jira_base_url: 'https://siva.atlassian.net'
-          source_control_range_from: 'test-123'
-          source_control_range_to: 'main'
+          source_control_range_from: 'origin/test-123'
+          source_control_range_to: 'origin/main'
           jira_ticket_id_pattern: 'TEST'
       - name: Get the changelog message
         run: echo "${{ steps.changelog.outputs.changelog_message }}"
