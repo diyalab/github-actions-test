@@ -25,6 +25,6 @@ jobs:
           jira_base_url: 'https://siva.atlassian.net'
           source_control_range_from: 'origin/test-123'
           source_control_range_to: 'origin/main'
-          jira_ticket_id_pattern: '/\[([A-Z]+\-[0-9]+)\]/i'
+          jira_ticket_id_pattern: '/([A-Z][A-Z0-9]+-[0-9]+)/ig'
       - name: Get the changelog message
         run: echo "${{ steps.changelog.outputs.changelog_message }}"
