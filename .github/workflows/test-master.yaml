@@ -15,16 +15,12 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Changelog
-        id: changelog
-        uses: connorsmallman/github-jira-changelog-action@v1.1.4
-        with:
-          jira_host: 'siva273.atlassian.net'
-          jira_email: 'cvaganesh.v@gmail.com'
-          jira_token: ${{ secrets.JIRA_TOKEN }}
-          jira_base_url: 'https://siva.atlassian.net'
-          source_control_range_from: 'origin/test-123'
-          source_control_range_to: 'origin/main'
-          jira_ticket_id_pattern: '/([A-Z][A-Z0-9]+-[0-9]+)/i'
-      - name: Get the changelog message
-        run: echo "${{ steps.changelog.outputs.changelog_message }}"
+      - name: Initialize mandatory git config
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email noreply@github.com
+      - name: checkout qa tag
+        run: |
+          git checkout qa_20220511_RC10
+          git tag prod_20220511_RC10
+          git push --tags
