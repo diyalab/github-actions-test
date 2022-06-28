@@ -1,4 +1,4 @@
-name: "pr test"
+name: "pr test1"
 on:
   pull_request:
     types: [opened]
