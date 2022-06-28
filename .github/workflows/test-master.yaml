@@ -9,10 +9,12 @@ jobs:
     container: sonarsource/sonar-scanner-cli:4.3
     env:
       SONAR_HOST_URL: https://sonarqube1.dev.spotdraft.com
-      SONAR_PROJECT_BASE_DIR: $GITHUB_WORKSPACE
+#       SONAR_PROJECT_BASE_DIR: $GITHUB_WORKSPACE
     steps:
       - uses: actions/checkout@v3
       - name: sonar-scan
         run: |
-          export SONAR_PROJECT_BASE_DIR=${{ github.workspace }}
           sudo sonar-scanner
+          
+          
+# export SONAR_PROJECT_BASE_DIR=${{ github.workspace }}
