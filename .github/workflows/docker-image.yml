@@ -8,8 +8,8 @@ name: Docker Image CI
 on:
   pull_request:
     types: [opened]
-  issue_comment:
-    types: [created]
+  # issue_comment:
+  #   types: [created]
 env:
   IMAGE_NAME: github-actions-test
 jobs:
