@@ -1,4 +1,4 @@
-name: "pr test"
+name: "pr test1"
 on:
   pull_request:
     types: [opened]
@@ -11,7 +11,7 @@ jobs:
       - uses: khan/pull-request-comment-trigger@v1.1.0
         id: check
         with:
-          trigger: '@deploy'
+          trigger: 'run test'
           reaction: rocket
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
