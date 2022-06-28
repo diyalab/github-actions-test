@@ -6,7 +6,7 @@ on:
 jobs:
   sonar-scan:
     runs-on: ubuntu-latest
-    container: sonarsource/sonar-scanner-cli:4.3
+    container: sonarsource/sonar-scanner-cli:4.7.0
     env:
       SONAR_HOST_URL: https://sonarqube1.dev.spotdraft.com
 #       SONAR_PROJECT_BASE_DIR: $GITHUB_WORKSPACE
