@@ -4,23 +4,15 @@ on:
     branches:
       - 'main'
 jobs:
-  hello_world_job:
+  sonar-scan:
     runs-on: ubuntu-latest
-    name: Changelog
+    container: sonarsource/sonar-scanner-cli:4.3
+    env:
+      SONAR_HOST_URL: https://sonarqube1.dev.spotdraft.com
+      SONAR_PROJECT_BASE_DIR: $GITHUB_WORKSPACE
     steps:
-      # - name: Set Version
-      #   run: echo ::set-env name=VERSION::1.1.1
-      # To use this repository's private action, you must check out the repository
-      - name: Check out code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Initialize mandatory git config
+      - uses: actions/checkout@v3
+      - name: sonar-scan
         run: |
-          git config user.name "GitHub Actions"
-          git config user.email noreply@github.com
-      - name: checkout qa tag
-        run: |
-          git checkout qa_20220614_RC34 
-          git tag prod_20220614_RC34 
-          git push --tags
+          export SONAR_PROJECT_BASE_DIR=${{ github.workspace }}
+          sudo sonar-scanner
