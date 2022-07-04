@@ -5,7 +5,6 @@ on:
       - qa_*
 jobs:
   get-previous-tag:
-    needs: [deploy-to-qa]
     runs-on: ubuntu-latest
     outputs:
       previous_tag: ${{ steps.previous-tag.outputs.previous_tag }}
