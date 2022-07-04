@@ -1,44 +1,26 @@
-name: "CI"
+name: Workflow for New Tag
 on:
-  push:
+  create:
     tags:
-      - "*"
-
+      - qa_*
 jobs:
-  release:
-    if: startsWith(github.ref, 'refs/tags/')
+  get-previous-tag:
+    needs: [deploy-to-qa]
     runs-on: ubuntu-latest
+    outputs:
+      previous_tag: ${{ steps.previous-tag.outputs.previous_tag }}
     steps:
-      - uses: actions/checkout@v3
+      - name: Check out code
+        uses: actions/checkout@v3
         with:
-          fetch-depth: 20
-      - name: "Build Changelog"
-        id: build_changelog
-        uses: mikepenz/release-changelog-builder-action@v3.0.0-rc01
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: "echoo0o"
-        env:
-          from_tag: ${{ steps.build_changelog.outputs.fromTag }}
-          to_tag: ${{ steps.build_changelog.outputs.toTag }}
-          changelog: ${{ steps.build_changelog.outputs.changelog }}
+          fetch-depth: 0
+      - name: Set env
         run: |
-          echo $from_tag
-          echo $to_tag
-          echo $changelog
-      - name: "Complex Configuration"
-        id: build_changelog2
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: mikepenz/release-changelog-builder-action@v3.0.0-rc01
+          echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      - name: get previous tag
+        id: previous-tag
+        uses: ./.github/get_previous_tag
         with:
-          # configuration: "configuration_complex.json"
-          owner: "diyalab"
-          repo: "github-actions-test"
-          ignorePreReleases: "false"
-          fromTag: "qa_20220511_RC10"
-          toTag: "qa_20220511_RC9"
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commitMode: "true"
-      - name: "echo"
-        run: |
-          echo ${{ steps.build_changelog2.outputs.changelog }}
+          tag: ${{ env.RELEASE_VERSION }}
+      - name: echo
+        run: echo ${{ steps.previous-tag.outputs.previous_tag }}
