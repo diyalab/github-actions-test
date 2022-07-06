@@ -1,1 +1,1 @@
-echo $JIRA_APP_URL
+echo "value is $JIRA_APP_URL"
