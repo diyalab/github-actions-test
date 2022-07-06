@@ -1,1 +1,1 @@
-echo ${ secrets.JIRA_APP_URL }
+echo $JIRA_APP_URL
