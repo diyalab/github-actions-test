@@ -8,7 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: sonar-scan
+      - name: echo
+        env:
+          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
         run: ./scripts/test.sh
           
           
