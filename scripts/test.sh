@@ -1,0 +1,1 @@
+echo ${{ secrets.JIRA_APP_URL }}
