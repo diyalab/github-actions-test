@@ -17,6 +17,7 @@ jobs:
           JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
         run: |
           pwd
+          ls
           ./scripts/test.sh
   # echo1:
   #   runs-on: [initial]
