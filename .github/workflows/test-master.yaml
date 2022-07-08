@@ -9,6 +9,9 @@ jobs:
     container: alpine/git:1.0.27
     steps:
       - uses: actions/checkout@v3
+      - name: Set env
+        run: |
+          echo "DEPLOY_ENV=QA" >> $GITHUB_ENV
       - name: echo
         env:
           JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
