@@ -1,8 +1,8 @@
 name: "test"
 on:
-  create:
-    tags:
-      - qa_*
+  push:
+    branches:
+      - 'main'
 jobs:
   echo:
     runs-on: [initial]
@@ -26,7 +26,7 @@ jobs:
         run: |
           pwd
           ls
-          ./scripts/test.sh
+          ./scripts/test/test.sh
   # echo1:
   #   runs-on: [initial]
   #   steps:
