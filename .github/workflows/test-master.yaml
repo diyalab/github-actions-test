@@ -12,6 +12,62 @@ jobs:
         env:
           JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
         run: ./scripts/test.sh
+  echo1:
+    runs-on: [initial]
+    steps:
+      - uses: actions/checkout@v3
+      - name: echo
+        env:
+          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
+        run: ./scripts/test.sh
+  echo2:
+    runs-on: [initial]
+    steps:
+      - uses: actions/checkout@v3
+      - name: echo
+        env:
+          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
+        run: ./scripts/test.sh
+  echo3:
+    runs-on: [initial]
+    steps:
+      - uses: actions/checkout@v3
+      - name: echo
+        env:
+          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
+        run: ./scripts/test.sh
+  echo4:
+    runs-on: [initial]
+    steps:
+      - uses: actions/checkout@v3
+      - name: echo
+        env:
+          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
+        run: ./scripts/test.sh
+  echo5:
+    runs-on: [initial]
+    steps:
+      - uses: actions/checkout@v3
+      - name: echo
+        env:
+          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
+        run: ./scripts/test.sh
+  echo6:
+    runs-on: [initial]
+    steps:
+      - uses: actions/checkout@v3
+      - name: echo
+        env:
+          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
+        run: ./scripts/test.sh
+  echo7:
+    runs-on: [initial]
+    steps:
+      - uses: actions/checkout@v3
+      - name: echo
+        env:
+          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
+        run: ./scripts/test.sh
           
           
 # export SONAR_PROJECT_BASE_DIR=${{ github.workspace }}
