@@ -18,6 +18,7 @@ jobs:
         run: |
           echo "DEPLOY_ENV=QA" >> $GITHUB_ENV
       - name: echo
+        shell: bash
         env:
           JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
           TAG_NAME: ${{ env.RELEASE_VERSION }}
