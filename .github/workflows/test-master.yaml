@@ -29,7 +29,7 @@ jobs:
           ./scripts/test/test.sh
           yq --version
           cat test.yaml
-          yq w test.yaml  django-app.image.tag $DEPLOY_ENV
+          yq eval ".djangoapp.image.tag = \"$DEPLOY_ENV\"" -i test.yaml
           echo "------"
           cat test.yaml
   # echo1:
