@@ -1,2 +1,4 @@
-name: 
-  siva: "ganesh"
+django-app:
+  image:
+    repository: eu.gcr.io/spotdraft-qa/sd/django-rest-api
+    tag: qa_20220706_RC4

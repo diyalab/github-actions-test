@@ -29,7 +29,7 @@ jobs:
           ./scripts/test/test.sh
           yq --version
           cat test.yaml
-          yq w -i test.yaml  "name.siva" "main"
+          yq w -i test.yaml  "django-app.image.tag" "siva"
           cat test.yaml
   # echo1:
   #   runs-on: [initial]
