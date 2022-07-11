@@ -30,6 +30,7 @@ jobs:
           yq --version
           cat test.yaml
           yq  -i  '.django-app.image.tag = "$DEPLOY_ENV"' test.yaml
+          echo "------"
           cat test.yaml
   # echo1:
   #   runs-on: [initial]
