@@ -27,6 +27,7 @@ jobs:
           pwd
           ls
           ./scripts/test/test.sh
+          cat test.yaml
           yq w -i test.yaml  "name.siva" "main"
           cat test.yaml
   # echo1:
