@@ -27,7 +27,8 @@ jobs:
           pwd
           ls
           ./scripts/test/test.sh
-          yq w -i test.yaml  "name" "ganesh"
+          yq w -i test.yaml  "name.siva" "main"
+          cat test.yaml
   # echo1:
   #   runs-on: [initial]
   #   steps:
