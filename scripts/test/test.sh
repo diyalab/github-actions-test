@@ -6,7 +6,6 @@ mkdir -p ~/.ssh/
 echo "$GITLAB_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
 ssh-keyscan -H gitlab.dev.spotdraft.com > ~/.ssh/known_hosts
 chmod 600 ~/.ssh/id_rsa
-apk add --no-cache git && apk add yq
 TAG_NAME=qa_20220706_RC7
 echo "::set-output name=tag::$TAG_NAME"
 # yq --version
@@ -59,4 +58,3 @@ echo "::set-output name=tag::$TAG_NAME"
 #     echo "Opened a new merge request and assigned to sudarsh";
 #     exit;
 # fi
-echo ${{ steps.echo.outputs.merge_request }}
