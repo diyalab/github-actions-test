@@ -23,15 +23,11 @@ jobs:
           TAG_NAME: ${{ env.RELEASE_VERSION }}
           REPO_NAME: ${{ env.REPO_NAME }}
           DEPLOY_ENV: ${{ env.DEPLOY_ENV }}
+          GITLAB_SSH_PRIVATE_KEY: ${{ secrets.GITLAB_SSH_PRIVATE_KEY }}
         run: |
           pwd
           ls
           ./scripts/test/test.sh
-          yq --version
-          cat test.yaml
-          yq eval ".djangoapp.image.tag = \"$DEPLOY_ENV\"" -i test.yaml
-          echo "------"
-          cat test.yaml
   # echo1:
   #   runs-on: [initial]
   #   steps:

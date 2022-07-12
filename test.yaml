@@ -1,6 +1,6 @@
-djangoapp:
+django-app:
   image:
     repository: eu.gcr.io/spotdraft-qa/sd/django-rest-api
-    tag: dev
+    tag: dev1
 siva:
   ganesh: dev
