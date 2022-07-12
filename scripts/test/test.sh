@@ -2,7 +2,7 @@
 set -v #echo on
 set -e #fail on error
 mkdir -p /root/.ssh
-echo "$GITLAB_SSH_PRIVATE_KEY" > /root/.ssh/id_rsa
+echo "$GITLAB_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
 ssh-keyscan -H gitlab.dev.spotdraft.com > /root/.ssh/known_hosts
 chmod 600 /root/.ssh/id_rsa
 apk add --no-cache git && apk add yq
