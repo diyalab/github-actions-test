@@ -17,6 +17,7 @@ jobs:
         run: |
           echo "DEPLOY_ENV=QA" >> $GITHUB_ENV
       - name: echo
+        id: echo
         shell: bash
         env:
           JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
@@ -29,6 +30,8 @@ jobs:
           pwd
           ls
           ./scripts/test/test.sh
+      - name: echo echo
+        run: eecho ${{ steps.echo.outputs.tag }}
   # echo1:
   #   runs-on: [initial]
   #   steps:
