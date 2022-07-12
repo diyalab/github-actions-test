@@ -42,6 +42,7 @@ BODY="{
 
 # reviewer id 125 is sudarsh gitlab user id
 
+
 LISTMR=`curl --silent "${GITLAB_HOST}/api/v4/projects/${CI_PROJECT_ID}/merge_requests?state=opened" --header "PRIVATE-TOKEN:${PRIVATE_TOKEN}"`;
 
 # check if any MR is already there for this source branch
