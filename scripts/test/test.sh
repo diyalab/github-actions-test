@@ -1,7 +1,7 @@
 #!/bin/bash
 set -v #echo on
 set -e #fail on error
-mkdir -p /root/.ssh
+# mkdir -p /root/.ssh
 echo "$GITLAB_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
 ssh-keyscan -H gitlab.dev.spotdraft.com > /root/.ssh/known_hosts
 chmod 600 /root/.ssh/id_rsa
