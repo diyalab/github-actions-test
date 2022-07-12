@@ -24,6 +24,7 @@ jobs:
           REPO_NAME: ${{ env.REPO_NAME }}
           DEPLOY_ENV: ${{ env.DEPLOY_ENV }}
           GITLAB_SSH_PRIVATE_KEY: ${{ secrets.GITLAB_SSH_PRIVATE_KEY }}
+          GITLAB_PRIVATE_TOKEN: ${{ secrets.GITLAB_PRIVATE_TOKEN }}
         run: |
           pwd
           ls
