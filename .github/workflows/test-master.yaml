@@ -31,7 +31,7 @@ jobs:
           ls
           ./scripts/test/test.sh
       - name: echo echo
-        run: echo ${{ steps.echo.outputs.tag }}
+        run: echo ${{ steps.echo.outputs.merge_request }}
   # echo1:
   #   runs-on: [initial]
   #   steps:
