@@ -11,8 +11,8 @@ echo "::set-output name=tag::$TAG_NAME"
 yq --version
 git config --global user.name "siva"
 git config --global user.email "siva@spotdraft.com"
-git clone --single-branch --branch master git@gitlab.dev.spotdraft.com:sd/argo-manifests.git
-cd argo-manifests/spotdraft
+git clone --single-branch --branch master $CD_GIT_REPOSITORY
+cd ${CD_CHART_REPO}/${CD_MAIFEST_FOLDER_DEV}
 if [ $DEPLOY_ENV == "QA" ]; then
     echo "updating QA image version"
     yq eval ".django-app.image.tag = \"$TAG_NAME\"" -i values-qa.yaml
