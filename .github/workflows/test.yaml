@@ -3,19 +3,12 @@ name: ci
 on:
   push:
     branches:
-      - 'siva'
+      - 'master'
 
 jobs:
   docker:
-    runs-on: ubuntu-latest
+    runs-on: initial
     steps:
-      -
-        name: Checkout
+      - name: Checkout
         uses: actions/checkout@v3
-      -
-        name: Build and push
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          push: false
-          tags: user/app:latest, user/app:latest
+      
