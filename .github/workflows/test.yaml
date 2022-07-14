@@ -17,13 +17,7 @@ jobs:
           install: true
           driver: kubernetes
       - name: Build and push
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          builder: ${{ steps.buildx.outputs.name }}
-          file: Dockerfile
-          push: false
-          tags: user/app:latest
+        run: docker build -t test .
   # docker:
   #   runs-on: [high-mem]
   #   steps:
