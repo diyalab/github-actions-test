@@ -14,6 +14,54 @@ jobs:
         env:
           JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
         run: echo $JIRA_APP_URL
+  build2:
+    runs-on: [high-mem]
+    steps:
+      - uses: actions/checkout@master
+      - name: Build and push
+        env:
+          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
+        run: echo $JIRA_APP_URL
+  build3:
+    runs-on: [high-mem]
+    steps:
+      - uses: actions/checkout@master
+      - name: Build and push
+        env:
+          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
+        run: echo $JIRA_APP_URL
+  build4:
+    runs-on: [high-mem]
+    steps:
+      - uses: actions/checkout@master
+      - name: Build and push
+        env:
+          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
+        run: echo $JIRA_APP_URL
+  build5:
+    runs-on: [high-mem]
+    steps:
+      - uses: actions/checkout@master
+      - name: Build and push
+        env:
+          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
+        run: echo $JIRA_APP_URL
+  build6:
+    runs-on: [high-mem]
+    steps:
+      - uses: actions/checkout@master
+      - name: Build and push
+        env:
+          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
+        run: echo $JIRA_APP_URL
+  build7:
+    runs-on: [high-mem]
+    steps:
+      - uses: actions/checkout@master
+      - name: Build and push
+        env:
+          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
+        run: echo $JIRA_APP_URL
   # docker:
   #   runs-on: [high-mem]
   #   steps:
