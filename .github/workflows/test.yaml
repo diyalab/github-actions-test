@@ -7,17 +7,17 @@ on:
 
 jobs:
   docker:
-    runs-on: [self-hosted, high-mem]
+    runs-on: [high-mem]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - name: sleep
-        run: sleep 1
+        run: sleep 2
   docker1:
-    runs-on: [self-hosted, high-mem]
+    runs-on: [high-mem]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - name: sleep
-        run: sleep 1
+        run: sleep 2
       
