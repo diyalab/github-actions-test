@@ -7,7 +7,7 @@ on:
 
 jobs:
   docker:
-    runs-on: initial
+    runs-on: [self-hosted, initial]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
