@@ -11,7 +11,9 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: Build and push
-        run: docker build -t test .
+        env:
+          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
+        run: echo $JIRA_APP_URL
   # docker:
   #   runs-on: [high-mem]
   #   steps:
