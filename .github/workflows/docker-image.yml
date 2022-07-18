@@ -1,15 +1,15 @@
 name: Docker Image CI
 
-# on:
-#   push:
-#     branches: [ main ]
+on:
+  push:
+    branches: [ zoo ]
 #   pull_request:
 #     branches: [ main ]
-on:
-  pull_request:
-    types: [opened]
-  # issue_comment:
-  #   types: [created]
+# # on:
+#   pull_request:
+#     types: [opened]
+#   # issue_comment:
+#   #   types: [created]
 env:
   IMAGE_NAME: github-actions-test
 jobs:
