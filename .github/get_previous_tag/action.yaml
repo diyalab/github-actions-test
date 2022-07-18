@@ -1,0 +1,63 @@
+name: Get Previous Tag
+description: "Get previous tag for supplied tag"
+inputs:
+  tag:
+    required: true
+    description: "tag on which current job is running"
+outputs:
+  previous_tag:
+    description: "previous tag for the supplied tag"
+    value: ${{ steps.previous-tag.outputs.previous_tag }}
+runs:
+  using: "composite"
+  steps:
+    - name: get previous tag
+      id: previous-tag
+      shell: bash
+      run: |
+        current_tag=${{ inputs.tag }}
+        echo "Current Tag: $current_tag"
+        current_release_date=`cut -d'_' -f2 <<< $current_tag`
+        current_release_branch=release-$current_release_date
+        echo "Current release branch: $current_release_branch"
+        git branch -r  | grep release  > remote-branches.txt
+        declare -a releases
+        while IFS= read -r line
+        do
+          date=`cut -d'-' -f2 <<< $line`
+          releases+=($date)
+        done < remote-branches.txt
+        number_of_releases=${#releases[@]}
+        echo "Number of release branches in remote $number_of_releases"
+        for i in "${!releases[@]}"; do
+            if [ "${releases[$i]}" = "${current_release_date}" ]; then
+                i=$((i-1))
+                previous_release_date=${releases[i]}
+                echo "previous release date is: ${releases[i]}"
+            fi
+        done
+        echo "Previous release branch: release-$previous_release_date"
+        count=`echo $current_tag | grep -o "_" | wc -l`
+        if [ $count == 1 ]
+        then
+            environment=`cut -d'_' -f1 <<< $current_tag`
+            search_key=${environment}_${previous_release_date}
+            echo $search_key
+            git for-each-ref --sort=creatordate --format '%(refname) %(creatordate)' refs/tags | grep $search_key > tags.txt
+            previous_tag_with_datetime=`tail -1 tags.txt | xargs`
+            previous_tag_ref=`cut -d' ' -f1 <<< $previous_tag_with_datetime`
+            previous_tag=`cut -d'/' -f3 <<< $previous_tag_ref`
+            echo "Previous tag is $previous_tag"
+        else
+            if [ $count == 2 ]
+            then
+                environment=`cut -d'_' -f1 <<< $current_tag`
+                search_key=${environment}_${current_release_date}
+                git for-each-ref --sort=creatordate --format '%(refname) %(creatordate)' refs/tags | grep $search_key > tags.txt
+                previous_tag_with_datetime=`tail -2 tags.txt | xargs`
+                previous_tag_ref=`cut -d' ' -f1 <<< $previous_tag_with_datetime`
+                previous_tag=`cut -d'/' -f3 <<< $previous_tag_ref`
+                echo "Previous tag is $previous_tag"
+            fi
+        fi
+        echo "::set-output name=previous_tag::$previous_tag"

@@ -3,19 +3,77 @@ name: ci
 on:
   push:
     branches:
-      - '*'
+      - 'main'
 
 jobs:
-  docker:
-    runs-on: ubuntu-latest
+  build:
+    runs-on: [high-mem]
     steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v3
-      -
-        name: Build and push
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          push: false
-          tags: user/app:latest, user/app:latest
+      - uses: actions/checkout@master
+      - name: Build and push
+        env:
+          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
+        run: echo $JIRA_APP_URL
+  build2:
+    runs-on: [high-mem]
+    steps:
+      - uses: actions/checkout@master
+      - name: Build and push
+        env:
+          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
+        run: echo $JIRA_APP_URL
+  build3:
+    runs-on: [high-mem]
+    steps:
+      - uses: actions/checkout@master
+      - name: Build and push
+        env:
+          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
+        run: echo $JIRA_APP_URL
+  build4:
+    runs-on: [high-mem]
+    steps:
+      - uses: actions/checkout@master
+      - name: Build and push
+        env:
+          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
+        run: echo $JIRA_APP_URL
+  build5:
+    runs-on: [high-mem]
+    steps:
+      - uses: actions/checkout@master
+      - name: Build and push
+        env:
+          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
+        run: echo $JIRA_APP_URL
+  build6:
+    runs-on: [high-mem]
+    steps:
+      - uses: actions/checkout@master
+      - name: Build and push
+        env:
+          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
+        run: echo $JIRA_APP_URL
+  build7:
+    runs-on: [high-mem]
+    steps:
+      - uses: actions/checkout@master
+      - name: Build and push
+        env:
+          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
+        run: echo $JIRA_APP_URL
+  # docker:
+  #   runs-on: [high-mem]
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
+  #     - name: sleep
+  #       run: sleep 200
+  # docker1:
+  #   runs-on: [high-mem]
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
+  #     - name: sleep
+  #       run: sleep 200
+      

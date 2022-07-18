@@ -1,20 +1,96 @@
 name: "test"
 on:
-  push:
-    branches:
-      - 'main'
+  create:
+    tags:
+      - qa_*
 jobs:
-  sonar-scan:
-    runs-on: ubuntu-latest
-    container: sonarsource/sonar-scanner-cli:4.7.0
-    env:
-      SONAR_HOST_URL: https://sonarqube1.dev.spotdraft.com
-#       SONAR_PROJECT_BASE_DIR: $GITHUB_WORKSPACE
+  echo:
+    runs-on: [ubuntu-latest]
     steps:
       - uses: actions/checkout@v3
-      - name: sonar-scan
+      - name: Set env
         run: |
-          sonar-scanner
+          echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+          echo "REPO_NAME=django-rest-api" >> $GITHUB_ENV
+          echo "DEPLOY_ENV=QA" >> $GITHUB_ENV
+      - name: Set env
+        run: |
+          echo "DEPLOY_ENV=QA" >> $GITHUB_ENV
+      - name: echo
+        id: echo
+        shell: bash
+        env:
+          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
+          TAG_NAME: ${{ env.RELEASE_VERSION }}
+          REPO_NAME: ${{ env.REPO_NAME }}
+          DEPLOY_ENV: ${{ env.DEPLOY_ENV }}
+          GITLAB_SSH_PRIVATE_KEY: ${{ secrets.GITLAB_SSH_PRIVATE_KEY }}
+          GITLAB_PRIVATE_TOKEN: ${{ secrets.GITLAB_PRIVATE_TOKEN }}
+          CD_GIT_REPOSITORY: ${{ secrets.CD_GIT_REPOSITORY }}
+          CD_CHART_REPO: ${{ secrets.CD_CHART_REPO }}
+          CD_MAIFEST_FOLDER_DEV: ${{ secrets.CD_MAIFEST_FOLDER_DEV }}
+        run: |
+          pwd
+          ls
+          ./scripts/test/test.sh
+      - name: echo echo
+        run: echo ${{ steps.echo.outputs.merge_request }}
+  # echo1:
+  #   runs-on: [initial]
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: echo
+  #       env:
+  #         JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
+  #       run: ./scripts/test.sh
+  # echo2:
+  #   runs-on: [initial]
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: echo
+  #       env:
+  #         JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
+  #       run: ./scripts/test.sh
+  # echo3:
+  #   runs-on: [initial]
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: echo
+  #       env:
+  #         JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
+  #       run: ./scripts/test.sh
+  # echo4:
+  #   runs-on: [initial]
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: echo
+  #       env:
+  #         JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
+  #       run: ./scripts/test.sh
+  # echo5:
+  #   runs-on: [initial]
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: echo
+  #       env:
+  #         JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
+  #       run: ./scripts/test.sh
+  # echo6:
+  #   runs-on: [initial]
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: echo
+  #       env:
+  #         JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
+  #       run: ./scripts/test.sh
+  # echo7:
+  #   runs-on: [initial]
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: echo
+  #       env:
+  #         JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
+  #       run: ./scripts/test.sh
           
           
 # export SONAR_PROJECT_BASE_DIR=${{ github.workspace }}
