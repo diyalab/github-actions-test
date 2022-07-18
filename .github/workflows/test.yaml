@@ -17,6 +17,7 @@ jobs:
           status: in_progress
           name: siva
       - name: sleep
+        id: sleep
         run: sleep 60
       - name: Report PHPUnit ending
         uses: dflydev/check-runs-action@v1.0.6
@@ -25,5 +26,5 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           id: phpunit
-          status: completed
-          name: siva
+          conclusion: ${{ steps.sleep.outcome }}
+          fail-on-error: true
