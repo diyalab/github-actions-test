@@ -1,30 +1,30 @@
-# name: ci
+name: ci
 
-# on:
-#   push:
+on:
+  push:
 
-# jobs:
-#   build:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Report PHPUnit Starting
-#         uses: dflydev/check-runs-action@v1.0.6
-#         env: 
-#           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
-#         with:
-#           token: ${{ secrets.GITHUB_TOKEN }}
-#           id: phpunit
-#           status: in_progress
-#           name: siva
-#       - name: sleep
-#         id: sleep
-#         run: sleep 60
-#       - name: Report PHPUnit ending
-#         uses: dflydev/check-runs-action@v1.0.6
-#         env: 
-#           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
-#         with:
-#           token: ${{ secrets.GITHUB_TOKEN }}
-#           id: phpunit
-#           conclusion: ${{ steps.sleep.outcome }}
-#           fail-on-error: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Report PHPUnit Starting
+        uses: dflydev/check-runs-action@v1.0.6
+        env: 
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          id: phpunit
+          status: in_progress
+          name: siva
+      - name: sleep
+        id: sleep
+        run: sleep 60
+      - name: Report PHPUnit ending
+        uses: dflydev/check-runs-action@v1.0.6
+        env: 
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          id: phpunit
+          conclusion: ${{ steps.sleep.outcome }}
+          fail-on-error: true
