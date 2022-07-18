@@ -9,6 +9,8 @@ jobs:
     steps:
       - name: Report PHPUnit Starting
         uses: dflydev/check-runs-action@v1.0.6
+        env: 
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           id: phpunit
