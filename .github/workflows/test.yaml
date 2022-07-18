@@ -2,78 +2,29 @@ name: ci
 
 on:
   push:
-    branches:
-      - 'main'
 
 jobs:
   build:
-    runs-on: [high-mem]
+    name: Build PHP Library
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
-      - name: Build and push
-        env:
-          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
-        run: echo $JIRA_APP_URL
-  build2:
-    runs-on: [high-mem]
-    steps:
-      - uses: actions/checkout@master
-      - name: Build and push
-        env:
-          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
-        run: echo $JIRA_APP_URL
-  build3:
-    runs-on: [high-mem]
-    steps:
-      - uses: actions/checkout@master
-      - name: Build and push
-        env:
-          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
-        run: echo $JIRA_APP_URL
-  build4:
-    runs-on: [high-mem]
-    steps:
-      - uses: actions/checkout@master
-      - name: Build and push
-        env:
-          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
-        run: echo $JIRA_APP_URL
-  build5:
-    runs-on: [high-mem]
-    steps:
-      - uses: actions/checkout@master
-      - name: Build and push
-        env:
-          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
-        run: echo $JIRA_APP_URL
-  build6:
-    runs-on: [high-mem]
-    steps:
-      - uses: actions/checkout@master
-      - name: Build and push
-        env:
-          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
-        run: echo $JIRA_APP_URL
-  build7:
-    runs-on: [high-mem]
-    steps:
-      - uses: actions/checkout@master
-      - name: Build and push
-        env:
-          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
-        run: echo $JIRA_APP_URL
-  # docker:
-  #   runs-on: [high-mem]
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
-  #     - name: sleep
-  #       run: sleep 200
-  # docker1:
-  #   runs-on: [high-mem]
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
-  #     - name: sleep
-  #       run: sleep 200
-      
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up PHP, with Composer and extensions
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+          coverage: pcov
+
+      - name: PHPUnit
+        id: phpunit
+        continue-on-error: true
+        run: ./vendor/bin/phpunit --coverage-text
+
+      - name: Report PHPUnit Conclusion
+        if: always()
+        uses: dflydev/check-runs-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          id: phpunit
+          conclusion: ${{ steps.phpunit.outcome }}
