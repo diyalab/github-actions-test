@@ -20,7 +20,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           name: Test XYZ
           status: queued
-          conclusion: ${{ job.status }}
+          # conclusion: ${{ job.status }}
           output: |
             {"summary": "tests started"}
       - uses: actions/checkout@v3
