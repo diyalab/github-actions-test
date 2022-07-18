@@ -16,14 +16,13 @@ jobs:
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
       - uses: LouisBrunner/checks-action@v1.1.1
-      if: always()
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        name: Test XYZ
-        status: queued
-        conclusion: ${{ job.status }}
-        output: |
-          {"summary": "tests started"}
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: Test XYZ
+          status: queued
+          conclusion: ${{ job.status }}
+          output: |
+            {"summary": "tests started"}
       - uses: actions/checkout@v3
         if: steps.check.outputs.triggered == 'true'
       - run: 'echo Found it! siva'
