@@ -16,6 +16,7 @@
 #         env:
 #           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
 #       - name: Report Unit tests starting
+#         if: steps.check.outputs.triggered == 'true'
 #         uses: dflydev/check-runs-action@v1.0.6
 #         env: 
 #           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
@@ -34,6 +35,7 @@
 #       - name: sleep
 #         run: sleep 60
 #       - name: Report Unit tests ending
+#         if: steps.check.outputs.triggered == 'true'
 #         uses: dflydev/check-runs-action@v1.0.6
 #         env: 
 #           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
@@ -49,10 +51,7 @@ on:
   issue_comment:
     types: [created]
 jobs:
-  # make sure the action works on a clean machines without building
-
-  ## Basic
-  test_basic_success:
+  test_with_init:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
@@ -71,6 +70,7 @@ jobs:
         name: Test With Init
         status: in_progress
     - run: sleep 30
+      if: steps.check.outputs.triggered == 'true'
     - uses: LouisBrunner/checks-action@v1.1.1
       if: steps.check.outputs.triggered == 'true'
       with:
@@ -80,4 +80,3 @@ jobs:
         output: |
           {"summary":"Some warnings in README.md"}
         conclusion: failure
-    
