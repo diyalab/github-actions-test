@@ -76,17 +76,6 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         check_id: ${{ steps.queue.outputs.check_id }}
-        name: Test With Init
-        status: queued
-    - run: sleep 60
-      if: steps.check.outputs.triggered == 'true'
-    - uses: LouisBrunner/checks-action@v1.1.1
-      id: init
-      if: steps.check.outputs.triggered == 'true'
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        check_id: ${{ steps.queue.outputs.check_id }}
-        name: Test With Init
         status: in_progress
     - run: sleep 60
       if: steps.check.outputs.triggered == 'true'
