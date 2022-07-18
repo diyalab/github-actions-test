@@ -5,25 +5,10 @@ on:
 
 jobs:
   build:
-    name: Build PHP Library
-    runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Set up PHP, with Composer and extensions
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 7.4
-          coverage: pcov
-
-      - name: PHPUnit
-        id: phpunit
-        continue-on-error: true
-        run: echo "siva"
-      - name: Report PHPUnit Conclusion
-        if: always()
+      - name: Report PHPUnit Starting
         uses: dflydev/check-runs-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           id: phpunit
-          conclusion: ${{ steps.phpunit.outcome }}
+          status: in_progress
