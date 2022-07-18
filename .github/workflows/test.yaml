@@ -2,78 +2,17 @@ name: ci
 
 on:
   push:
-    branches:
-      - 'main'
 
 jobs:
   build:
-    runs-on: [high-mem]
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
-      - name: Build and push
-        env:
-          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
-        run: echo $JIRA_APP_URL
-  build2:
-    runs-on: [high-mem]
-    steps:
-      - uses: actions/checkout@master
-      - name: Build and push
-        env:
-          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
-        run: echo $JIRA_APP_URL
-  build3:
-    runs-on: [high-mem]
-    steps:
-      - uses: actions/checkout@master
-      - name: Build and push
-        env:
-          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
-        run: echo $JIRA_APP_URL
-  build4:
-    runs-on: [high-mem]
-    steps:
-      - uses: actions/checkout@master
-      - name: Build and push
-        env:
-          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
-        run: echo $JIRA_APP_URL
-  build5:
-    runs-on: [high-mem]
-    steps:
-      - uses: actions/checkout@master
-      - name: Build and push
-        env:
-          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
-        run: echo $JIRA_APP_URL
-  build6:
-    runs-on: [high-mem]
-    steps:
-      - uses: actions/checkout@master
-      - name: Build and push
-        env:
-          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
-        run: echo $JIRA_APP_URL
-  build7:
-    runs-on: [high-mem]
-    steps:
-      - uses: actions/checkout@master
-      - name: Build and push
-        env:
-          JIRA_APP_URL: ${{ secrets.JIRA_APP_URL }}
-        run: echo $JIRA_APP_URL
-  # docker:
-  #   runs-on: [high-mem]
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
-  #     - name: sleep
-  #       run: sleep 200
-  # docker1:
-  #   runs-on: [high-mem]
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
-  #     - name: sleep
-  #       run: sleep 200
-      
+      - name: Report PHPUnit Starting
+        uses: dflydev/check-runs-action@v1.0.6
+        env: 
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          id: phpunit
+          status: in_progress
+          name: siva
