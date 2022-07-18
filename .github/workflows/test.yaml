@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Report PHPUnit Starting
-        uses: dflydev/check-runs-action@v1
+        uses: dflydev/check-runs-action@v1.0.6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           id: phpunit
