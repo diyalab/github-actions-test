@@ -15,14 +15,15 @@ jobs:
           reaction: rocket
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
-      - uses: LouisBrunner/checks-action@v1.1.1
+      - name: Report PHPUnit Starting
+        uses: dflydev/check-runs-action@v1.0.6
+        env: 
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          name: Test XYZ
-          status: queued
-          # conclusion: ${{ job.status }}
-          output: |
-            {"summary": "tests started"}
+          id: unit test
+          status: in_progress
+          name: unit tests
       - uses: actions/checkout@v3
         if: steps.check.outputs.triggered == 'true'
       - run: 'echo Found it! siva'
