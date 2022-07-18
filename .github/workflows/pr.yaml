@@ -64,15 +64,19 @@ jobs:
       env:
         GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
     - uses: LouisBrunner/checks-action@v1.1.1
+      id: init
       if: steps.check.outputs.triggered == 'true'
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        name: Test Basic Success
-        conclusion: success
-     - uses: LouisBrunner/checks-action@v1.1.1
-       id: init
-       if: steps.check.outputs.triggered == 'true'
-       with:
-         token: ${{ secrets.GITHUB_TOKEN }}
-         name: Test With Init
-         status: in_progress
+        name: Test With Init
+        status: in_progress
+    - run: sleep 30
+    - uses: LouisBrunner/checks-action@v1.1.1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        check_id: ${{ steps.init.outputs.check_id }}
+        status: completed
+        output: |
+          {"summary":"Some warnings in README.md"}
+        conclusion: failure
+    
