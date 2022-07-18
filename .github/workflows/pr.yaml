@@ -1,3 +1,47 @@
+# name: "pr test1"
+# on:
+#   pull_request:
+#     types: [opened]
+#   issue_comment:
+#     types: [created]
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: diyalab/pull-request-comment-trigger@v1.1.0
+#         id: check
+#         with:
+#           trigger: 'run test'
+#           reaction: rocket
+#         env:
+#           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+#       - name: Report Unit tests starting
+#         uses: dflydev/check-runs-action@v1.0.6
+#         env: 
+#           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+#         with:
+#           token: ${{ secrets.GITHUB_TOKEN }}
+#           id: unit_test
+#           status: in_progress
+#           name: unit tests
+#       - uses: actions/checkout@v3
+#         if: steps.check.outputs.triggered == 'true'
+#       - run: 'echo Found it! siva'
+#         if: steps.check.outputs.triggered == 'true'
+#       - run: |
+#           cat test.js
+#         if: steps.check.outputs.triggered == 'true'
+#       - name: sleep
+#         run: sleep 60
+#       - name: Report Unit tests ending
+#         uses: dflydev/check-runs-action@v1.0.6
+#         env: 
+#           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+#         with:
+#           token: ${{ secrets.GITHUB_TOKEN }}
+#           id: unit_test
+#           conclusion: ${{ steps.sleep.outcome }}
+#           fail-on-error: true
 name: "pr test1"
 on:
   pull_request:
@@ -5,42 +49,35 @@ on:
   issue_comment:
     types: [created]
 jobs:
-  deploy:
+  # make sure the action works on a clean machines without building
+
+  ## Basic
+  test_basic_success:
     runs-on: ubuntu-latest
     steps:
-      - uses: diyalab/pull-request-comment-trigger@v1.1.0
-        id: check
-        with:
-          trigger: 'run test'
-          reaction: rocket
-        env:
-          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
-      - name: Report Unit tests starting
-        if: steps.check.outputs.triggered == 'true'
-        uses: dflydev/check-runs-action@v1.0.6
-        env: 
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          id: unit_test
-          status: in_progress
-          name: unit tests
-      - uses: actions/checkout@v3
-        if: steps.check.outputs.triggered == 'true'
-      - run: 'echo Found it! siva'
-        if: steps.check.outputs.triggered == 'true'
-      - run: |
-          cat test.js
-        if: steps.check.outputs.triggered == 'true'
-      - name: sleep
-        run: sleep 60
-      - name: Report Unit tests ending
-        if: steps.check.outputs.triggered == 'true'
-        uses: dflydev/check-runs-action@v1.0.6
-        env: 
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          id: unit_test
-          conclusion: ${{ steps.sleep.outcome }}
-          fail-on-error: true
+    - uses: actions/checkout@v1
+    - uses: diyalab/pull-request-comment-trigger@v1.1.0
+      id: check
+      with:
+        trigger: 'run test'
+        reaction: rocket
+      env:
+        GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+    - uses: LouisBrunner/checks-action@v1.1.1
+      id: init
+      if: steps.check.outputs.triggered == 'true'
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        name: Test With Init
+        status: in_progress
+    - run: sleep 30
+    - uses: LouisBrunner/checks-action@v1.1.1
+      if: steps.check.outputs.triggered == 'true'
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        check_id: ${{ steps.init.outputs.check_id }}
+        status: completed
+        output: |
+          {"summary":"Some warnings in README.md"}
+        conclusion: failure
+    
