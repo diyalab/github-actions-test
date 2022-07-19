@@ -21,7 +21,7 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         name: Unit tests
-        conclusion: cancelled
+        conclusion: neutral
     - name: Run a one-line script
       if: ${{ github.event.label.name == 'test' }}
       run: echo Hello, world!
