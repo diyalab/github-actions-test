@@ -91,39 +91,56 @@
 
 
 
+# name: "pr test1"
+# on:
+#   pull_request:
+#     types: [opened]
+#   issue_comment:
+#     types: [created]
+# jobs:
+#   status_check:
+#     runs-on: ubuntu-latest
+#     name: Creates status check for scheduled deployments
+#     steps:
+#       - uses: actions/checkout@v3
+#       - uses: diyalab/pull-request-comment-trigger@v1.1.0
+#         id: check
+#         with:
+#           trigger: 'run test'
+#           reaction: rocket
+#         env:
+#           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+#       - name: Create status check
+#         continue-on-error: true
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#           REPO: ${{ github.repository }}
+#           RUN_ID: ${{ github.run_id }}
+#         # if: steps.check.outputs.triggered == 'true'
+#         run: |
+#           DEPLOY_COMMIT=$(git rev-parse HEAD)
+#           gh api \
+#             --method POST \
+#             -H "Accept: application/vnd.github.v3+json" \
+#             /repos/$REPO/statuses/$DEPLOY_COMMIT \
+#             -f state='success' \
+#             -f target_url='https://github.com/$REPO/actions/runs/$RUN_ID' \
+#             -f description='The latest scheduled deploy succeeded!' \
+#             -f context='scheduled-deploy'
+
 name: "pr test1"
 on:
   pull_request:
     types: [opened]
-  issue_comment:
-    types: [created]
+    types: [ labeled ]
+  # issue_comment:
+  #   types: [created]
 jobs:
-  status_check:
+  build:
+    if: ${{ github.event.label.name == 'test' }}
     runs-on: ubuntu-latest
-    name: Creates status check for scheduled deployments
+
     steps:
-      - uses: actions/checkout@v3
-      - uses: diyalab/pull-request-comment-trigger@v1.1.0
-        id: check
-        with:
-          trigger: 'run test'
-          reaction: rocket
-        env:
-          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
-      - name: Create status check
-        continue-on-error: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: ${{ github.repository }}
-          RUN_ID: ${{ github.run_id }}
-        # if: steps.check.outputs.triggered == 'true'
-        run: |
-          DEPLOY_COMMIT=$(git rev-parse HEAD)
-          gh api \
-            --method POST \
-            -H "Accept: application/vnd.github.v3+json" \
-            /repos/$REPO/statuses/$DEPLOY_COMMIT \
-            -f state='success' \
-            -f target_url='https://github.com/$REPO/actions/runs/$RUN_ID' \
-            -f description='The latest scheduled deploy succeeded!' \
-            -f context='scheduled-deploy'
+    - uses: actions/checkout@v2
+    - name: Run a one-line script
+      run: echo Hello, world!
