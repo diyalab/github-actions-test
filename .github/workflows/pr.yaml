@@ -23,5 +23,5 @@ jobs:
         name: Unit tests
         conclusion: cancelled
     - name: Run a one-line script
-      if: ${{ (github.event.label.name == 'test')  && (github.event_name == 'labeled') }}
+      if: ${{ github.event.label.name == 'test' }}
       run: echo Hello, world!
