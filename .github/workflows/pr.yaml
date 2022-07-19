@@ -2,7 +2,8 @@ name: "pr test1"
 on:
   pull_request:
     types: [opened]
-    types: [ labeled ]
+  label:
+    types: [created]
   # issue_comment:
   #   types: [created]
 jobs:
