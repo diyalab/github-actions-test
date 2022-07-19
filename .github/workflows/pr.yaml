@@ -1,16 +1,29 @@
 name: "pr test1"
 on:
   pull_request:
-    types: [opened]
-    types: [ labeled ]
+    types: [opened, labeled]
+  # label:
+  #   types: [created]
   # issue_comment:
   #   types: [created]
 jobs:
-  build:
-    if: ${{ github.event.label.name == 'test' }}
+  echo:
     runs-on: ubuntu-latest
-
+    steps:
+      - name: echo
+        run: echo "siva"
+  build:
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - uses: LouisBrunner/checks-action@v1.1.1
+      if: |
+        ${{ github.event.label.name != 'test' }}
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        name: Unit tests
+        conclusion: cancelled
     - name: Run a one-line script
+      if: |
+        ${{ github.event.label.name == 'test' }} && ${{ github.event.type == 'labeled' }}
       run: echo Hello, world!
