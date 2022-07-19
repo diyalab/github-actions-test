@@ -10,13 +10,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions-ecosystem/action-remove-labels@v1
-        if: ${{ startsWith(github.event.comment.body, '/add-labels') }}
+        if: ${{ startsWith(github.event.comment.body, '/run-test') }}
         with:
-          github_token: ${{ secrets.github_token }}
+          github_token: ${{ secrets.REPO_GITHUB_TOKEN }}
           labels: |
             test
       - uses: actions-ecosystem/action-add-labels@v1
-        if: ${{ startsWith(github.event.comment.body, '/add-labels') }}
+        if: ${{ startsWith(github.event.comment.body, '/run-test') }}
         with:
+          github_token: ${{ secrets.REPO_GITHUB_TOKEN }}
           labels: |
             test
