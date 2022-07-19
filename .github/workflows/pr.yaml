@@ -7,23 +7,39 @@ on:
   # issue_comment:
   #   types: [created]
 jobs:
-  echo:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: echo
         run: echo "siva"
-  build:
+  test:
     runs-on: ubuntu-latest
+    if: ${{ github.event.label.name == 'test' }}
     steps:
     - uses: actions/checkout@v2
     - uses: LouisBrunner/checks-action@v1.1.1
-      if: |
-        ${{ github.event.label.name != 'test' }} && ${{ github.event.type == 'labeled' }}
+      if: ${{ github.event.label.name != 'test' }}
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         name: Unit tests
         conclusion: cancelled
     - name: Run a one-line script
-      if: |
-        ${{ github.event.label.name == 'test' }} && ${{ github.event.type == 'labeled' }}
+      # if: ${{ github.event.label.name == 'test' }}
       run: echo Hello, world!
+  mypy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.label.name == 'test' }}
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run a one-line script
+      # if: ${{ github.event.label.name == 'test' }}
+      run: echo Hello, world!
+  test-on-labels:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.label.name != 'test' }}
+    steps:
+    - uses: LouisBrunner/checks-action@v1.1.1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        name: Unit tests
+        conclusion: cancelled
