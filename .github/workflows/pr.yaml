@@ -116,7 +116,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
           RUN_ID: ${{ github.run_id }}
-        if: steps.check.outputs.triggered == 'true'
+        # if: steps.check.outputs.triggered == 'true'
         run: |
           DEPLOY_COMMIT=$(git rev-parse HEAD)
           gh api \
