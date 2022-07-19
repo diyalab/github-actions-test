@@ -18,12 +18,12 @@ jobs:
     - uses: actions/checkout@v2
     - uses: LouisBrunner/checks-action@v1.1.1
       if: |
-        ${{ github.event.label.name != 'test' }} && ${{ github.event.type == 'labeled' }}
+        ${{ github.event.label.name != 'test' }} && ${{ github.event_name == 'labeled' }}
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         name: Unit tests
         conclusion: cancelled
     - name: Run a one-line script
       if: |
-        ${{ github.event.label.name == 'test' }} && ${{ github.event.type == 'labeled' }}
+        ${{ github.event.label.name == 'test' }} && ${{ github.event_name == 'labeled' }}
       run: echo Hello, world!
