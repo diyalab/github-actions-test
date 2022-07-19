@@ -17,7 +17,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: LouisBrunner/checks-action@v1.1.1
-      if: always()
+      if: ${{ github.event.label.name != 'test' }}
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         name: Unit tests
