@@ -1,9 +1,9 @@
 name: "pr test1"
 on:
   pull_request:
-    types: [opened]
-  label:
-    types: [created]
+    types: [opened, labeled]
+  # label:
+  #   types: [created]
   # issue_comment:
   #   types: [created]
 jobs:
