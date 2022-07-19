@@ -34,7 +34,7 @@ jobs:
     - name: Run a one-line script
       # if: ${{ github.event.label.name == 'test' }}
       run: echo Hello, world!
-  test-on-labels:
+  test-with-labels:
     runs-on: ubuntu-latest
     if: ${{ github.event.label.name != 'test' }}
     steps:
