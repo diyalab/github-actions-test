@@ -1,45 +1,15 @@
-name: "pr test1"
+name: workflow for PR
 on:
   pull_request:
     types: [opened, labeled]
-  # label:
-  #   types: [created]
-  # issue_comment:
-  #   types: [created]
 jobs:
   build:
+    if: ${{ github.event.label.name == 'ok-to-test' }}
     runs-on: ubuntu-latest
     steps:
-      - name: echo
-        run: echo "siva"
-  test:
-    runs-on: ubuntu-latest
-    if: ${{ github.event.label.name == 'test' }}
-    steps:
-    - uses: actions/checkout@v2
-    - uses: LouisBrunner/checks-action@v1.1.1
-      if: ${{ github.event.label.name != 'test' }}
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        name: Unit tests
-        conclusion: cancelled
-    - name: Run a one-line script
-      # if: ${{ github.event.label.name == 'test' }}
-      run: echo Hello, world!
-  mypy:
-    runs-on: ubuntu-latest
-    if: ${{ github.event.label.name == 'test' }}
-    steps:
-    - uses: actions/checkout@v2
-    - name: Run a one-line script
-      # if: ${{ github.event.label.name == 'test' }}
-      run: echo Hello, world!
-  test-with-labels:
-    runs-on: ubuntu-latest
-    if: ${{ github.event.label.name != 'test' }}
-    steps:
-    - uses: LouisBrunner/checks-action@v1.1.1
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        name: Unit tests
-        conclusion: cancelled
+      - uses: actions/checkout@v3
+      - uses: actions-ecosystem/action-add-labels@v1
+        with:
+          github_token: ${{ secrets.REPO_GITHUB_TOKEN }}
+          labels: |
+            test-passed
