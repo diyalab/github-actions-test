@@ -1,0 +1,54 @@
+name: Create Release Branch
+on:
+  workflow_dispatch:
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: make release branch name
+        id: release-name
+        shell: bash
+        run: |
+          date=`echo $(date '+%Y-%m-%d') | tr -d '-'`
+          echo "::set-output name=release::release-$date"
+          echo "::set-output name=date::$date"
+          echo "::set-output name=repo-name::$GITHUB_REPOSITORY"
+          echo "::set-output name=tag::qa_$date"
+      - name: check-release-barnch-exists
+        run: |
+          echo ${{ steps.release-name.outputs.release }}
+          if git rev-parse --verify --quiet remotes/origin/${{ steps.release-name.outputs.release }} > /dev/null; then
+            echo "Branch name ${{ steps.release-name.outputs.release }} already exists."
+            exit 1
+          fi
+      - name: create Release branch
+        run: git checkout -b ${{ steps.release-name.outputs.release }}
+      - name: Initialize mandatory git config
+        run: |
+          git config user.name ${{ secrets.GIT_BOT_USERNAME }}
+          git config user.email ${{ secrets.GIT_BOT_EMAIL }}
+      - name: push Branch to remote
+        run: git push -u origin ${{ steps.release-name.outputs.release }}:${{ steps.release-name.outputs.release }}
+      - name: Tag commit
+        uses: tvdias/github-tagger@v0.0.1
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+          tag: "my_tag"
+      # - name: git create and push tag
+      #   run: |
+      #     git branch -a
+      #     git tag ${{ steps.release-name.outputs.tag }}
+      #     git push --tags
+      - name: Slack Notification
+        uses: ./.github/slack_message
+        with:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_ICON: https://cdn.spotdraft.com/devops/rocket-launch.jpeg
+          SLACK_MESSAGE: "Release branch ${{ steps.release-name.outputs.release }} created and tagged with ${{ steps.release-name.outputs.tag }}, https://github.com/${{ steps.release-name.outputs.repo-name }}/releases/tag/${{ steps.release-name.outputs.tag }} :rocket:"
+          SLACK_TITLE: New Release Branch ${{ steps.release-name.outputs.release }} Created on ${{ steps.release-name.outputs.repo-name }}
+          SLACK_USERNAME: ${{ secrets.GIT_BOT_USERNAME }}
