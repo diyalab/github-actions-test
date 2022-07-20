@@ -33,16 +33,16 @@ jobs:
           git config user.email noreply@github.com
       - name: push Branch to remote
         run: git push -u origin ${{ steps.release-name.outputs.release }}:${{ steps.release-name.outputs.release }}
-      - name: Tag commit
-        uses: tvdias/github-tagger@v0.0.1
-        with:
-          repo-token: "${{ secrets.GITHUB_TOKEN }}"
-          tag: "my_tag"
-      # - name: git create and push tag
-      #   run: |
-      #     git branch -a
-      #     git tag ${{ steps.release-name.outputs.tag }}
-      #     git push --tags
+      # - name: Tag commit
+      #   uses: tvdias/github-tagger@v0.0.1
+      #   with:
+      #     repo-token: "${{ secrets.GITHUB_TOKEN }}"
+      #     tag: "my_tag"
+      - name: git create and push tag
+        run: |
+          git branch -a
+          git tag ${{ steps.release-name.outputs.tag }}
+          git push --tags
       - name: Slack Notification
         uses: ./.github/slack_message
         with:
