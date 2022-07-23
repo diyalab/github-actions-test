@@ -76,12 +76,17 @@ jobs:
       #   run: |
       #     LATEST_COMMIT_ID=`git rev-parse HEAD`
       #     echo "latest commit id $LATEST_COMMIT_ID"
-      - name: create and push tag
-        uses: tvdias/github-tagger@v0.0.2
+      # - name: create and push tag
+      #   uses: tvdias/github-tagger@v0.0.2
+      #   with:
+      #     repo-token: "${{ secrets.GH_BOT_TOKEN }}"
+      #     tag: ${{ needs.generate-new-tag.outputs.new_tag }}
+      #     commit-sha: ${{ env.LATEST_COMMIT_ID}}
+      - uses: rickstaa/action-create-tag@v1.3
         with:
-          repo-token: "${{ secrets.GH_BOT_TOKEN }}"
           tag: ${{ needs.generate-new-tag.outputs.new_tag }}
-          commit-sha: ${{ env.LATEST_COMMIT_ID}}
+          github_token: "${{ secrets.GH_BOT_TOKEN }}"
+          commit_sha: ${{ env.LATEST_COMMIT_ID}}
       # - name: Slack Notification
       #   uses: ./.github/slack_message
       #   with:
