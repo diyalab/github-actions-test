@@ -128,14 +128,17 @@ jobs:
         with:
           fetch-depth: 0
       - name: Set env
+        id: set-env
         run: |
           echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+          echo "::set-output name=latest_release::1"
       - name: get previous tag
         id: previous-tag
         uses: ./.github/get_previous_tag
         with:
           tag: ${{ env.RELEASE_VERSION }}
       - name: echo
+        if: setps.set-env.outputs.latest_release == 1
         run: echo ${{ steps.previous-tag.outputs.previous_tag }}
   create-release:
     needs: [get-previous-tag]
