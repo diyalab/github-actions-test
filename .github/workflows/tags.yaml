@@ -215,5 +215,5 @@ jobs:
           SLACK_COLOR: ${{ job.status }}
           SLACK_ICON: https://cdn.spotdraft.com/devops/rocket-launch.jpeg
           SLACK_MESSAGE: ${{ needs.create-release.outputs.changelog_message }}
-          SLACK_TITLE: New tag  ${{ env.RELEASE_VERSION }} created on ${{ github.repository }} , MR to deploy changes to QA https://gitlab.dev.spotdraft.com/sd/django-rest-api/-/merge_requests/5555
+          SLACK_TITLE: New tag  ${{ env.RELEASE_VERSION }} created on ${{ github.repository }} , [MR](https://gitlab.dev.spotdraft.com/sd/django-rest-api/-/merge_requests/5555) to deploy changes to QA 
           SLACK_USERNAME: Github-Actions
