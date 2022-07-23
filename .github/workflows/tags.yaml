@@ -138,7 +138,7 @@ jobs:
         with:
           tag: ${{ env.RELEASE_VERSION }}
       - name: echo
-        if: setps.set-env.outputs.latest_release == 1
+        if: steps.set-env.outputs.latest_release == 1
         run: echo ${{ steps.previous-tag.outputs.previous_tag }}
   create-release:
     needs: [get-previous-tag]
