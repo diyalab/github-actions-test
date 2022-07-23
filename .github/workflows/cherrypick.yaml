@@ -40,8 +40,8 @@ jobs:
           fetch-depth: 0
       - name: Initialize mandatory git config
         run: |
-          git config user.name ${{ secrets.GIT_BOT_USERNAME }}
-          git config user.email ${{ secrets.GIT_BOT_EMAIL }}
+          git config user.name "GitHub Action"
+          git config user.email "github-action@users.noreply.github.com"
       - name: validate Branch selected is in last two release branches
         shell: bash
         run: |
@@ -51,12 +51,16 @@ jobs:
         id: create-tag
         shell: bash
         run: |
+          OLD_COMMIT_ID=`git rev-parse HEAD`
+          echo "starting commit id $OLD_COMMIT_ID"
           for i in $(echo ${{ inputs.commitIds }}| sed "s/,/ /g" )
           do
               commit=`echo $i | xargs`
               git cherry-pick -x $commit
           done
           git push origin $GITHUB_REF_NAME
+          LATEST_COMMIT_ID=`git rev-parse HEAD`
+          echo "latest commit id $LATEST_COMMIT_ID"
           echo "VERSION=${{ needs.generate-new-tag.outputs.new_tag }}" >> $GITHUB_ENV
   push-tag:
     runs-on: ubuntu-latest
@@ -66,17 +70,21 @@ jobs:
         uses: actions/checkout@v3 # verified creator
         with:
           fetch-depth: 0
-      - name: create and push tag
-        uses: tvdias/github-tagger@v0.0.1
-        with:
-          repo-token: "${{ secrets.GH_BOT_PAT }}"
-          tag: ${{ needs.generate-new-tag.outputs.new_tag }}
-      - name: Slack Notification
-        uses: ./.github/slack_message
-        with:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_COLOR: ${{ job.status }}
-          SLACK_ICON: https://cdn.spotdraft.com/devops/rocket-launch.jpeg
-          SLACK_MESSAGE: Cherry Picked commits ${{ inputs.commitIds }}
-          SLACK_TITLE: Created a new tag ${{ needs.generate-new-tag.outputs.new_tag }}  on ${{ github.repository }}
-          SLACK_USERNAME: ${{ secrets.GIT_BOT_USERNAME }}
+      - name: echo commitid
+        run: |
+          LATEST_COMMIT_ID=`git rev-parse HEAD`
+          echo "latest commit id $LATEST_COMMIT_ID"
+      # - name: create and push tag
+      #   uses: tvdias/github-tagger@v0.0.1
+      #   with:
+      #     repo-token: "${{ secrets.GH_BOT_PAT }}"
+      #     tag: ${{ needs.generate-new-tag.outputs.new_tag }}
+      # - name: Slack Notification
+      #   uses: ./.github/slack_message
+      #   with:
+      #     SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+      #     SLACK_COLOR: ${{ job.status }}
+      #     SLACK_ICON: https://cdn.spotdraft.com/devops/rocket-launch.jpeg
+      #     SLACK_MESSAGE: Cherry Picked commits ${{ inputs.commitIds }}
+      #     SLACK_TITLE: Created a new tag ${{ needs.generate-new-tag.outputs.new_tag }}  on ${{ github.repository }}
+      #     SLACK_USERNAME: ${{ secrets.GIT_BOT_USERNAME }}
