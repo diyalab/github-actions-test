@@ -13,111 +13,111 @@ jobs:
       - name: Set env
         run: |
           echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-      - uses: ./.github/build_and_push_ghcr
-        id: build
-        with:
-          push-image: true
-          environment: ${{ env.RELEASE_VERSION }}
-          image_name: ghcr.io/spotdraft/django-rest-api
-          GITHUB_TOKEN: ${{ secrets.GHCR_TOKEN }}
-          PYTHON_BASE_IMAGE: ${{ secrets.PYTHON_BASE_IMAGE }}
-  tests:
-    needs: build
-    if: ${{ startsWith(github.ref, 'refs/tags/qa') }}
-    name: Unit Tests
-    services:
-      postgres:
-        image: postgres:11.3
-        env:
-          POSTGRES_HOST_AUTH_METHOD: trust
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-    runs-on: ubuntu-latest
-    container: ${{ needs.build.outputs.image_name }}:${{ needs.build.outputs.image_tag }}
-    steps:
-      - uses: actions/checkout@v3
-      - name: setup postgres
-        env:
-          MIGRATION_DB_SQL_FILE: resources/test_database/migrations_dump.sql
-        run: |
-          psql -U postgres -h postgres -d postgres -c 'create database "spotdraft-django-rest-api";'
-          psql -U postgres -h postgres -d "spotdraft-django-rest-api" -1 -f $MIGRATION_DB_SQL_FILE
-      - uses: ./.github/unit_tests
-        with:
-          tag: ${{ needs.build.outputs.image_tag }}
-          image_name: ${{ needs.build.outputs.image_name }}
-  mypy:
-    needs: build
-    name: MyPy lint
-    runs-on: ubuntu-latest
-    container: ${{ needs.build.outputs.image_name }}:${{ needs.build.outputs.image_tag }}
-    steps:
-      - uses: actions/checkout@v3
-      - uses: ./.github/mypy_lint
-        id: mypy
-        with:
-          tag: ${{ needs.build.outputs.image_tag }}
-          image_name: ${{ needs.build.outputs.image_name }}
-  push-image-to-gcr:
-    needs: [build, tests, mypy]
-    if: ${{ startsWith(github.ref, 'refs/tags/qa') }}
-    name: Push image to GCR
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: ./.github/push_image_to_gcr
-        id: push
-        with:
-          source_image_tag: ${{ needs.build.outputs.image_tag }}
-          destination_tag: ${{ needs.build.outputs.image_tag }}
-          destination_image_name: eu.gcr.io/spotdraft-qa/sd/django-rest-api
-          source_image_name: ${{ needs.build.outputs.image_name }}
-          GOOGLE_AUTH_KEY_CONTENT: ${{ secrets.GOOGLE_AUTH_KEY_CONTENT }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
-  purge-image:
-    if: |
-      always() && ${{ startsWith(github.ref, 'refs/tags/qa') }}
-    needs: [build, push-image-to-gcr]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: ./.github/purge_image_from_ghcr
-        with:
-          owner: spotdraft
-          name: django-rest-api
-          tag: ${{ needs.build.outputs.image_tag }}
-          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
-  deploy-to-qa:
-    needs: [build, push-image-to-gcr]
-    if: ${{ startsWith(github.ref, 'refs/tags/qa') }}
-    runs-on: ubuntu-latest
-    outputs:
-      merge_request: ${{ steps.deploy-to-qa.outputs.merge_request }}
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set env
-        run: |
-          echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-          echo "REPO_NAME=django-rest-api" >> $GITHUB_ENV
-          echo "DEPLOY_ENV=QA" >> $GITHUB_ENV
-      - name: deploy to qa
-        id: deploy-to-qa
-        env:
-          GITLAB_SSH_PRIVATE_KEY: ${{ secrets.GITLAB_SSH_PRIVATE_KEY }}
-          CD_GIT_REPOSITORY: ${{ secrets.CD_GIT_REPOSITORY }}
-          CD_CHART_REPO: ${{ secrets.CD_CHART_REPO }}
-          CD_MAIFEST_FOLDER_DEV: ${{ secrets.CD_MAIFEST_FOLDER_DEV }}
-          TAG_NAME: ${{ env.RELEASE_VERSION }}
-          REPO_NAME: ${{ env.REPO_NAME }}
-          DEPLOY_ENV: ${{ env.DEPLOY_ENV }}
-          GITLAB_PRIVATE_TOKEN: ${{ secrets.GITLAB_PRIVATE_TOKEN }}
-        run: ./scripts/actions/create_mr_in_gitlab.sh
+      # - uses: ./.github/build_and_push_ghcr
+      #   id: build
+      #   with:
+      #     push-image: true
+      #     environment: ${{ env.RELEASE_VERSION }}
+      #     image_name: ghcr.io/spotdraft/django-rest-api
+      #     GITHUB_TOKEN: ${{ secrets.GHCR_TOKEN }}
+      #     PYTHON_BASE_IMAGE: ${{ secrets.PYTHON_BASE_IMAGE }}
+  # tests:
+  #   needs: build
+  #   if: ${{ startsWith(github.ref, 'refs/tags/qa') }}
+  #   name: Unit Tests
+  #   services:
+  #     postgres:
+  #       image: postgres:11.3
+  #       env:
+  #         POSTGRES_HOST_AUTH_METHOD: trust
+  #       options: >-
+  #         --health-cmd pg_isready
+  #         --health-interval 10s
+  #         --health-timeout 5s
+  #         --health-retries 5
+  #   runs-on: ubuntu-latest
+  #   container: ${{ needs.build.outputs.image_name }}:${{ needs.build.outputs.image_tag }}
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: setup postgres
+  #       env:
+  #         MIGRATION_DB_SQL_FILE: resources/test_database/migrations_dump.sql
+  #       run: |
+  #         psql -U postgres -h postgres -d postgres -c 'create database "spotdraft-django-rest-api";'
+  #         psql -U postgres -h postgres -d "spotdraft-django-rest-api" -1 -f $MIGRATION_DB_SQL_FILE
+  #     - uses: ./.github/unit_tests
+  #       with:
+  #         tag: ${{ needs.build.outputs.image_tag }}
+  #         image_name: ${{ needs.build.outputs.image_name }}
+  # mypy:
+  #   needs: build
+  #   name: MyPy lint
+  #   runs-on: ubuntu-latest
+  #   container: ${{ needs.build.outputs.image_name }}:${{ needs.build.outputs.image_tag }}
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: ./.github/mypy_lint
+  #       id: mypy
+  #       with:
+  #         tag: ${{ needs.build.outputs.image_tag }}
+  #         image_name: ${{ needs.build.outputs.image_name }}
+  # push-image-to-gcr:
+  #   needs: [build, tests, mypy]
+  #   if: ${{ startsWith(github.ref, 'refs/tags/qa') }}
+  #   name: Push image to GCR
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: ./.github/push_image_to_gcr
+  #       id: push
+  #       with:
+  #         source_image_tag: ${{ needs.build.outputs.image_tag }}
+  #         destination_tag: ${{ needs.build.outputs.image_tag }}
+  #         destination_image_name: eu.gcr.io/spotdraft-qa/sd/django-rest-api
+  #         source_image_name: ${{ needs.build.outputs.image_name }}
+  #         GOOGLE_AUTH_KEY_CONTENT: ${{ secrets.GOOGLE_AUTH_KEY_CONTENT }}
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
+  # purge-image:
+  #   if: |
+  #     always() && ${{ startsWith(github.ref, 'refs/tags/qa') }}
+  #   needs: [build, push-image-to-gcr]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: ./.github/purge_image_from_ghcr
+  #       with:
+  #         owner: spotdraft
+  #         name: django-rest-api
+  #         tag: ${{ needs.build.outputs.image_tag }}
+  #         GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+  # deploy-to-qa:
+  #   needs: [build, push-image-to-gcr]
+  #   if: ${{ startsWith(github.ref, 'refs/tags/qa') }}
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     merge_request: ${{ steps.deploy-to-qa.outputs.merge_request }}
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Set env
+  #       run: |
+  #         echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+  #         echo "REPO_NAME=django-rest-api" >> $GITHUB_ENV
+  #         echo "DEPLOY_ENV=QA" >> $GITHUB_ENV
+  #     - name: deploy to qa
+  #       id: deploy-to-qa
+  #       env:
+  #         GITLAB_SSH_PRIVATE_KEY: ${{ secrets.GITLAB_SSH_PRIVATE_KEY }}
+  #         CD_GIT_REPOSITORY: ${{ secrets.CD_GIT_REPOSITORY }}
+  #         CD_CHART_REPO: ${{ secrets.CD_CHART_REPO }}
+  #         CD_MAIFEST_FOLDER_DEV: ${{ secrets.CD_MAIFEST_FOLDER_DEV }}
+  #         TAG_NAME: ${{ env.RELEASE_VERSION }}
+  #         REPO_NAME: ${{ env.REPO_NAME }}
+  #         DEPLOY_ENV: ${{ env.DEPLOY_ENV }}
+  #         GITLAB_PRIVATE_TOKEN: ${{ secrets.GITLAB_PRIVATE_TOKEN }}
+  #       run: ./scripts/actions/create_mr_in_gitlab.sh
 
   get-previous-tag:
-    needs: [deploy-to-qa]
+    needs: [build]
     if: ${{ startsWith(github.ref, 'refs/tags/qa') }}
     runs-on: ubuntu-latest
     outputs:
@@ -138,7 +138,7 @@ jobs:
       - name: echo
         run: echo ${{ steps.previous-tag.outputs.previous_tag }}
   create-release:
-    needs: [deploy-to-qa, get-previous-tag]
+    needs: [get-previous-tag]
     if: ${{ startsWith(github.ref, 'refs/tags/qa') }}
     runs-on: ubuntu-latest
     outputs:
