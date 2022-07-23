@@ -36,7 +36,7 @@ jobs:
       - name: create and push tag
         uses: tvdias/github-tagger@v0.0.1
         with:
-          repo-token: "${{ secrets.GH_BOT_PAT }}"
+          # repo-token: "${{ secrets.GH_BOT_PAT }}"
           tag: ${{ steps.release-name.outputs.tag }}
       - name: Slack Notification
         uses: ./.github/slack_alert
