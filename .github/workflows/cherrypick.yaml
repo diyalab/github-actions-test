@@ -61,6 +61,7 @@ jobs:
           git push origin $GITHUB_REF_NAME
           LATEST_COMMIT_ID=`git rev-parse HEAD`
           echo "latest commit id $LATEST_COMMIT_ID"
+          git push origin $GITHUB_REF_NAME
           echo "VERSION=${{ needs.generate-new-tag.outputs.new_tag }}" >> $GITHUB_ENV
   push-tag:
     runs-on: ubuntu-latest
@@ -74,11 +75,11 @@ jobs:
         run: |
           LATEST_COMMIT_ID=`git rev-parse HEAD`
           echo "latest commit id $LATEST_COMMIT_ID"
-      # - name: create and push tag
-      #   uses: tvdias/github-tagger@v0.0.1
-      #   with:
-      #     repo-token: "${{ secrets.GH_BOT_PAT }}"
-      #     tag: ${{ needs.generate-new-tag.outputs.new_tag }}
+      - name: create and push tag
+        uses: tvdias/github-tagger@v0.0.1
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+          tag: ${{ needs.generate-new-tag.outputs.new_tag }}
       # - name: Slack Notification
       #   uses: ./.github/slack_message
       #   with:
