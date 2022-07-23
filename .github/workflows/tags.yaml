@@ -157,6 +157,7 @@ jobs:
       - name: Set env
         run: |
           echo "VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+          echo ${{ needs.get-previous-tag.outputs.skip_deploy }}
       - name: Jira Release
         id: jira-changelog
         uses: ./.github/jira_release
