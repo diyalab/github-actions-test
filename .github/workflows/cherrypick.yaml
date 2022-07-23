@@ -79,7 +79,7 @@ jobs:
       - name: create and push tag
         uses: tvdias/github-tagger@v0.0.1
         with:
-          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+          repo-token: "${{ secrets.GH_BOT_TOKEN }}"
           tag: ${{ needs.generate-new-tag.outputs.new_tag }}
           commit-sha: ${{ env.LATEST_COMMIT_ID}}
       # - name: Slack Notification
