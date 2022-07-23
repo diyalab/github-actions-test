@@ -198,7 +198,7 @@ jobs:
           environment-display-name: 'django-rest-api QA ALL_REGIONS'
           environment-type: 'staging'
   slack-alert:
-    needs: [create-release, deploy-to-qa]
+    needs: [create-release]
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
