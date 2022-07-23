@@ -1,0 +1,65 @@
+name: Generate New Tag
+description: "Generate new tag based on current tag and release branch"
+inputs:
+  release-branch:
+    required: true
+    description: "Release branch name on which tag has to be created"
+  environment:
+    required: true
+    default: "qa"
+    description: "Environment for which tag is getting created  accepted qa or prod"
+outputs:
+  new_tag:
+    description: "The new tag which was generated"
+    value: ${{ steps.generate-tag.outputs.new_tag }}
+  previous_tag:
+    description: "The docker image tag as generated during build"
+    value: ${{ steps.generate-tag.outputs.previous_tag }}
+runs:
+  using: "composite"
+  steps:
+    - name: Check out code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: Generate New Tag
+      id: generate-tag
+      shell: bash
+      run: |
+        export TERM=xterm-color
+        echo ${{ inputs.release-branch }}
+        release_date=`cut -d'-' -f2 <<< ${{ inputs.release-branch }}`
+        search_key=${{ inputs.environment }}_$release_date
+        git for-each-ref --sort=creatordate --format '%(refname) %(creatordate)' refs/tags | grep $search_key > tags.txt
+        if [ $? -eq 0 ]
+        then
+          current_latest_tag_with_datetime=`tail -1 tags.txt | xargs`
+          current_latest_tag_ref=`cut -d' ' -f1 <<< $current_latest_tag_with_datetime`
+          current_latest_tag=`cut -d'/' -f3 <<< $current_latest_tag_ref`
+          echo  $current_latest_tag
+          count=`echo $current_latest_tag | grep -o "_" | wc -l`
+          if [ $count == 1 ]
+          then
+              echo "old tag is $current_latest_tag"
+              new_tag="${current_latest_tag}_RC1"
+              echo "new tag is $new_tag"
+          else
+              if [ $count == 2 ]
+              then
+                  echo "old tag is $current_latest_tag"
+                  f1=`cut -d'_' -f1 <<< $current_latest_tag`
+                  f2=`cut -d'_' -f2 <<< $current_latest_tag`
+                  f3=`cut -d'_' -f3 <<< $current_latest_tag`
+                  rc_number=`echo $f3 | grep -Eo '[0-9]+$'`
+                  rc_number_new=$((rc_number+1))
+                  new_tag=${f1}_${f2}_RC${rc_number_new}
+                  echo $new_tag
+              fi
+          fi
+        else
+            new_tag=${{ inputs.environment }}_$release_date
+            echo "New tag: $new_tag"
+        fi
+        echo "new tag is $new_tag"
+        echo "::set-output name=new_tag::$new_tag"
+        echo "::set-output name=previous_tag::$current_latest_tag"

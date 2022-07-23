@@ -1,0 +1,169 @@
+name: Promote to PROD
+on:
+  workflow_dispatch:
+    inputs:
+      qa_tag:
+        description: "QA tag which has to be promoted"
+        required: true
+        type: string
+jobs:
+  generate-new-tag:
+    runs-on: ubuntu-latest
+    outputs:
+      new_tag: ${{ steps.generate_new_tag.outputs.new_tag }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Generate New tag
+        uses: ./.github/generate_new_tag
+        id: generate_new_tag
+        with:
+          release-branch: $GITHUB_REF_NAME
+          environment: prod
+  git-tag-and-push:
+    runs-on: ubuntu-latest
+    needs: [generate-new-tag]
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: checkout qa tag
+        run: |
+          git checkout ${{ inputs.qa_tag }}
+      - name: create and push tag
+        uses: tvdias/github-tagger@v0.0.1
+        with:
+          repo-token: "${{ secrets.GH_BOT_PAT }}"
+          tag: ${{ needs.generate-new-tag.outputs.new_tag }}
+  push-image-to-gcr:
+    runs-on: ubuntu-latest
+    needs: [generate-new-tag,git-tag-and-push]
+    name: Push image to GCR
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/push_image_to_gcr
+        id: push
+        with:
+          source_image_tag: ${{ inputs.qa_tag }}
+          destination_tag: ${{ needs.generate-new-tag.outputs.new_tag }}
+          destination_image_name: eu.gcr.io/spotdraft-prod/sd/django-rest-api
+          source_image_name: eu.gcr.io/spotdraft-qa/sd/django-rest-api
+          GOOGLE_AUTH_KEY_CONTENT: ${{ secrets.GOOGLE_AUTH_KEY_CONTENT_PROD }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
+  deploy-to-prod:
+    needs: [generate-new-tag,push-image-to-gcr]
+    runs-on: ubuntu-latest
+    container: alpine/git:1.0.27
+    steps:
+      - name: Set env
+        run: |
+          echo "RELEASE_VERSION=${{ needs.generate-new-tag.outputs.new_tag }}" >> $GITHUB_ENV
+      - name: deploy to prod
+        run: |
+          export GCR_REPO=asia.gcr.io/draftspot-177614/sd/django-rest-api
+          export TAG_NAME=${{ needs.generate-new-tag.outputs.new_tag }}
+          mkdir -p /root/.ssh
+          echo ${{ secrets.GITLAB_SSH_PRIVATE_KEY }} > /root/.ssh/id_rsa
+          ssh-keyscan -H gitlab.dev.spotdraft.com > /root/.ssh/known_hosts
+          chmod 600 /root/.ssh/id_rsa
+          apk add --no-cache git && apk add yq
+          yq --version
+          git config --global user.name "siva"
+          git config --global user.email "siva@spotdraft.com"
+          git clone --single-branch --branch master ${{ secrets.CD_GIT_REPOSITORY }}
+          cd ${{ secrets.CD_CHART_REPO }}/${{ secrets.CD_MAIFEST_FOLDER_DEV }}
+          yq w -i values-prod-eu.yaml  "django-app.image.tag" "$TAG_NAME"
+          yq w -i values-prod-india.yaml "django-app.image.tag" "$TAG_NAME"
+          yq w -i values-prod-usa.yaml "django-app.image.tag" "$TAG_NAME"
+          git commit -am "update image tag from ci pipeline for ${{ secrets.CD_MAIFEST_FOLDER_DEV }} PROD DJANGO BE" && git push origin master
+  get-previous-tag:
+    needs: [generate-new-tag,deploy-to-prod]
+    runs-on: ubuntu-latest
+    outputs:
+      previous_tag: ${{ steps.previous-tag.outputs.previous_tag }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: get previous tag
+        id: previous-tag
+        uses: ./.github/get_previous_tag
+        with:
+          tag: ${{ needs.generate-new-tag.outputs.new_tag }}
+      - name: echo
+        run: echo ${{ steps.previous-tag.outputs.previous_tag }}
+  create-release:
+    needs: [deploy-to-prod, get-previous-tag, generate-new-tag]
+    runs-on: ubuntu-latest
+    outputs:
+      changelog_message: ${{ steps.jira-changelog.outputs.changelog_message }}
+    steps:
+      - name: Set env
+        run: |
+          echo "RELEASE=${{ needs.generate-new-tag.outputs.new_tag }}" >> $GITHUB_ENV
+      - name: Jira Release
+        id: jira-changelog
+        uses: ./.github/jira_release
+        with:
+          jira_host: ${{ secrets.JIRA_HOST }}
+          jira_email: ${{ secrets.JIRA_EMAIL }}
+          jira_token: ${{ secrets.JIRA_TOKEN }}
+          jira_base_url: ${{ secrets.JIRA_BASE_URL }}
+          source_control_range_from: ${{ needs.get-previous-tag.outputs.previous_tag }}
+          source_control_range_to: ${{ needs.generate-new-tag.outputs.new_tag }}
+      - name: Create a GitHub release
+        id: github_release
+        uses: ./.github/github_release
+        with:
+          tag: ${{ needs.generate-new-tag.outputs.new_tag }}
+          changelog_message: ${{ steps.jira-changelog.outputs.changelog_message }}
+      - name: Parse Jira Keys from changelog
+        id: jira_keys
+        uses: SpotDraft/jira-extract-issue-keys@v0.3-alpha
+        with:
+          commit-message: ${{ steps.jira-changelog.outputs.changelog_message }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Push Deployment Info to Jira
+        if: steps.jira_keys.outputs.jira-keys != ''
+        id: push_deployment_info_to_jira
+        uses: SpotDraft/jira-upload-deployment-info@v0.1-alpha
+        with:
+          cloud-instance-base-url: 'https://spotdraft.atlassian.net'
+          client-id: '${{ secrets.JIRA_CLIENT_ID }}'
+          client-secret: '${{ secrets.JIRA_CLIENT_SECRET }}'
+          deployment-sequence-number: '${{ github.run_id }}'
+          update-sequence-number: '${{ github.run_id }}'
+          issue-keys: "${{ steps.jira_keys.outputs.jira-keys }}"
+          display-name: "django-rest-api ${{ env.RELEASE }} "
+          url: "https://github.com/${{ github.repository }}/releases/tag/${{ env.RELEASE }}"
+          description: "django-rest-api ${{ env.RELEASE }} "
+          last-updated: '${{github.event.head_commit.timestamp}}'
+          # label: 'Test Deployment Label'
+          state: 'successful'
+          pipeline-id: '${{ github.repository }} ${{ github.workflow }}'
+          pipeline-display-name: 'Workflow: ${{ github.workflow }} (#${{ github.run_number }})'
+          pipeline-url: 'https://github.com/${{ github.repository }}/actions/runs/${{github.run_id}}'
+          environment-id: 'PROD'
+          environment-display-name: 'django-rest-api PROD ALL_REGIONS'
+          environment-type: 'production'
+  slack-alert:
+    needs: [generate-new-tag,create-release]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set env
+        run: |
+          echo "RELEASE_VERSION=${{ needs.generate-new-tag.outputs.new_tag }}" >> $GITHUB_ENV
+      - name: Slack Notification
+        uses: ./.github/slack_message
+        with:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_ICON: https://cdn.spotdraft.com/devops/rocket-launch.jpeg
+          SLACK_MESSAGE: ${{ needs.create-release.outputs.changelog_message }}
+          SLACK_TITLE: New tag  ${{ env.RELEASE_VERSION }} created on ${{ github.repository }}
+          SLACK_USERNAME: Github-Actions

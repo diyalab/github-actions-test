@@ -1,0 +1,18 @@
+name: Create Github Release for TAG
+description: "Create Github Release notes for Tag supplied "
+inputs:
+  tag:
+    required: true
+    description: "Tag for which Release is created"
+  changelog_message:
+    required: true
+    description: "Change log notes"
+runs:
+  using: "composite"
+  steps:
+    - name: Create a GitHub release
+      uses: SpotDraft/release-action@v1
+      with:
+        tag: ${{ inputs.tag }}
+        name: ${{ inputs.tag }}
+        body: ${{ inputs.changelog_message }}

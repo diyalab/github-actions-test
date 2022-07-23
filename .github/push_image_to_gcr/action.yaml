@@ -1,0 +1,41 @@
+name: Push docker image to Google container registry
+description: "Tag docker image from github container registry and push to google container registry"
+inputs:
+  destination_image_name:
+    required: true
+    default: "eu.gcr.io/sd/django-rest-api"
+    description: "Full path of image in container registry with out tag of destination image"
+  destination_tag:
+    required: true
+    description: "he docker image tag of destination image"
+  source_image_name:
+    required: true
+    default: "ghcr.io/spotdraft/django-rest-api"
+    description: "Full path of image in container registry with out tag of source image"
+  source_image_tag:
+    required: true
+    description: "The docker image tag of source image"
+  GITHUB_TOKEN:
+    required: true
+    description: "Github token to pull image from ghcr"
+  GOOGLE_AUTH_KEY_CONTENT:
+    required: true
+    description: "Contents of JSON Key file for a GCP SA or Principal which has permissions to push image to gcr"
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v3
+    - name: Log in to ghcr registry
+      shell: bash
+      run: echo "${{ inputs.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
+    - name: Push Image to GCR
+      env:
+        GOOGLE_AUTH_KEY_CONTENT: ${{ inputs.GOOGLE_AUTH_KEY_CONTENT }}
+      shell: bash
+      run: |
+        echo $GOOGLE_AUTH_KEY_CONTENT >> gcr_key.json
+        cat gcr_key.json | docker login -u _json_key --password-stdin https://eu.gcr.io
+        docker pull ${{ inputs.source_image_name }}:${{ inputs.source_image_tag }}
+        docker tag ${{ inputs.source_image_name }}:${{ inputs.source_image_tag }} \
+            ${{ inputs.destination_image_name }}:${{ inputs.destination_tag }}
+        docker push ${{ inputs.destination_image_name }}:${{ inputs.destination_tag }}

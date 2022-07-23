@@ -1,0 +1,71 @@
+name: Build Docker Image
+description: "Build and Push docke image to github container registry"
+inputs:
+  PYTHON_BASE_IMAGE:
+    required: true
+    default: "ghcr.io/spotdraft/python:3.7.12-prod"
+    description: "base python image on which dcoker image is build for this repo"
+  push-image:
+    required: true
+    default: "false"
+    description: "When set to true, the image built is also pushed. If set to false the image is only built and not pushed. Useful for situations when the image is needed locally"
+  environment:
+    required: true
+    default: "branch"
+    description: "Name of workflow, if workflow is for master then environment name is master, this varable is to just make image tag"
+  image_name:
+    required: true
+    default: "ghcr.io/spotdraft/django-rest-api"
+    description: "Full docker image path excluding tag"
+  GITHUB_TOKEN:
+    required: true
+    description: "GitHub Token used to log into GHCR"
+outputs:
+  image_name:
+    description: "The docker image path excluding tag."
+    value: "ghcr.io/spotdraft/django-rest-api"
+  image_tag:
+    description: "The docker image tag as generated during build"
+    value: ${{ steps.image_tag.outputs.tag }}
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v3 #verified creator
+    - name: Log in to registry
+      shell: bash
+      run: echo ${{ inputs.GITHUB_TOKEN }} | docker login ghcr.io -u $ --password-stdin
+    - name: Get date of commit
+      id: date
+      shell: bash
+      run: echo "::set-output name=date::$(git show -s --format=%cd --date=format:'%Y-%m-%d' $GITHUB_SHA)"
+    - name: make image tag
+      id: image_tag
+      shell: bash
+      env:
+        image_name: ${{ inputs.image_name }}
+        commit_date: ${{ steps.date.outputs.date }}
+        environment: ${{ inputs.environment }}
+      run: |
+        if [ ${{ inputs.environment }} == "master" ] || [ ${{ inputs.environment }} == "pr" ];
+        then
+          echo "::set-output name=tag::$(echo $environment-$commit_date-$GITHUB_SHA )"
+        else
+          echo "::set-output name=tag::$environment"
+        fi
+    - name: Set up Docker Buildx
+      id: buildx
+      uses: docker/setup-buildx-action@master #verified creator
+      with:
+        install: true
+    - name: Build branch image
+      uses: docker/build-push-action@v2 #verified creator
+      id: build
+      with:
+        context: .
+        builder: ${{ steps.buildx.outputs.name }}
+        file: Dockerfile
+        push: ${{ inputs.push-image }}
+        tags: ${{ inputs.image_name }}:${{ steps.image_tag.outputs.tag }}
+        build-args: PYTHON_BASE_IMAGE=${{ inputs.PYTHON_BASE_IMAGE }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max

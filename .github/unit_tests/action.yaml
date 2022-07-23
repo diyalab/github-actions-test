@@ -1,0 +1,30 @@
+name: Run Unit Tests
+description: "Run unit tests"
+inputs:
+  tag:
+    required: true
+    description: "The image on which to run unit tests. This is expected to be a django image with pip and other dependencies already installed"
+  image_name:
+    required: true
+    default: "ghcr.io/spotdraft/django-rest-api"
+    description: "Full path of image in GHCR with out tag"
+  bot_token:
+    required: true
+    description: "spotdraft-bot PAT"
+runs:
+  using: "composite"
+  steps:
+    - name: Tests
+      shell: bash
+      run: |
+        cd /app
+        export DATABASE_URL=postgres://postgres@postgres:5432/spotdraft-django-rest-api
+        export GEOIP_DATA_PATH=/geo/data/
+        export TEST_OUTPUT_DIR=$GITHUB_WORKSPACE/test_reports/
+        echo "TEST_OUTPUT_DIR=$TEST_OUTPUT_DIR"
+        echo "TEST_OUTPUT_DIR=$TEST_OUTPUT_DIR" >> $GITHUB_ENV
+        mkdir -p $TEST_OUTPUT_DIR
+        (coverage run manage.py test --keepdb) || error_code=$?
+        coverage lcov -o ${TEST_OUTPUT_DIR}coverage.lcov
+        ls $TEST_OUTPUT_DIR
+        exit $error_code

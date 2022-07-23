@@ -1,0 +1,44 @@
+name: Build Postgres Docker Image With Migrations
+
+on:
+  schedule:
+    # Runs "at every monday 6:30 AM daily"
+    - cron: "0 1 * * *"
+
+jobs:
+  build-postgres-docker-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Log in to registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
+      - uses: ./.github/build_and_push_ghcr
+        id: build
+        with:
+          push-image: true
+          environment: master
+          image_name: ghcr.io/spotdraft/django-rest-api
+          GITHUB_TOKEN: ${{ secrets.GHCR_TOKEN }}
+          PYTHON_BASE_IMAGE: ${{ secrets.PYTHON_BASE_IMAGE }}
+      - name: Build Postgres Image with Migrations
+        run: |
+          docker network create spot
+          docker run --rm -it --name postgres --net spot -d \
+            -p  5432:5432 -e POSTGRES_HOST_AUTH_METHOD=trust \
+            -e  PGDATA=/postgres ghcr.io/spotdraft/postgres:11.3-with-migrations
+          until pg_isready -h localhost -p 5432 -U postgres
+          do
+            echo "Waiting for postgres to start"
+            sleep 2;
+          done
+          docker run --net spot \
+            -e DATABASE_URL=postgres://postgres@postgres:5432/test_spotdraft-django-rest-api \
+            ghcr.io/spotdraft/django-rest-api:${{ steps.build.outputs.image_tag }} python manage.py migrate
+          docker commit postgres ghcr.io/spotdraft/postgres:11.3-with-migrations
+          docker push ghcr.io/spotdraft/postgres:11.3-with-migrations
+      - uses: ./.github/purge_image_from_ghcr
+        with:
+          owner: spotdraft
+          name: django-rest-api
+          tag: ${{ steps.build.outputs.image_tag }}
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}

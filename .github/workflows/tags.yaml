@@ -1,0 +1,219 @@
+name: Workflow for New Tag
+on:
+  create:
+jobs:
+  build:
+    if: ${{ startsWith(github.ref, 'refs/tags/qa') }}
+    runs-on: ubuntu-latest
+    outputs:
+      image_name: ${{ steps.build.outputs.image_name }}
+      image_tag: ${{ steps.build.outputs.image_tag }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set env
+        run: |
+          echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      - uses: ./.github/build_and_push_ghcr
+        id: build
+        with:
+          push-image: true
+          environment: ${{ env.RELEASE_VERSION }}
+          image_name: ghcr.io/spotdraft/django-rest-api
+          GITHUB_TOKEN: ${{ secrets.GHCR_TOKEN }}
+          PYTHON_BASE_IMAGE: ${{ secrets.PYTHON_BASE_IMAGE }}
+  tests:
+    needs: build
+    if: ${{ startsWith(github.ref, 'refs/tags/qa') }}
+    name: Unit Tests
+    services:
+      postgres:
+        image: postgres:11.3
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    runs-on: ubuntu-latest
+    container: ${{ needs.build.outputs.image_name }}:${{ needs.build.outputs.image_tag }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: setup postgres
+        env:
+          MIGRATION_DB_SQL_FILE: resources/test_database/migrations_dump.sql
+        run: |
+          psql -U postgres -h postgres -d postgres -c 'create database "spotdraft-django-rest-api";'
+          psql -U postgres -h postgres -d "spotdraft-django-rest-api" -1 -f $MIGRATION_DB_SQL_FILE
+      - uses: ./.github/unit_tests
+        with:
+          tag: ${{ needs.build.outputs.image_tag }}
+          image_name: ${{ needs.build.outputs.image_name }}
+  mypy:
+    needs: build
+    name: MyPy lint
+    runs-on: ubuntu-latest
+    container: ${{ needs.build.outputs.image_name }}:${{ needs.build.outputs.image_tag }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/mypy_lint
+        id: mypy
+        with:
+          tag: ${{ needs.build.outputs.image_tag }}
+          image_name: ${{ needs.build.outputs.image_name }}
+  push-image-to-gcr:
+    needs: [build, tests, mypy]
+    if: ${{ startsWith(github.ref, 'refs/tags/qa') }}
+    name: Push image to GCR
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/push_image_to_gcr
+        id: push
+        with:
+          source_image_tag: ${{ needs.build.outputs.image_tag }}
+          destination_tag: ${{ needs.build.outputs.image_tag }}
+          destination_image_name: eu.gcr.io/spotdraft-qa/sd/django-rest-api
+          source_image_name: ${{ needs.build.outputs.image_name }}
+          GOOGLE_AUTH_KEY_CONTENT: ${{ secrets.GOOGLE_AUTH_KEY_CONTENT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
+  purge-image:
+    if: |
+      always() && ${{ startsWith(github.ref, 'refs/tags/qa') }}
+    needs: [build, push-image-to-gcr]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/purge_image_from_ghcr
+        with:
+          owner: spotdraft
+          name: django-rest-api
+          tag: ${{ needs.build.outputs.image_tag }}
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+  deploy-to-qa:
+    needs: [build, push-image-to-gcr]
+    if: ${{ startsWith(github.ref, 'refs/tags/qa') }}
+    runs-on: ubuntu-latest
+    outputs:
+      merge_request: ${{ steps.deploy-to-qa.outputs.merge_request }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set env
+        run: |
+          echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+          echo "REPO_NAME=django-rest-api" >> $GITHUB_ENV
+          echo "DEPLOY_ENV=QA" >> $GITHUB_ENV
+      - name: deploy to qa
+        id: deploy-to-qa
+        env:
+          GITLAB_SSH_PRIVATE_KEY: ${{ secrets.GITLAB_SSH_PRIVATE_KEY }}
+          CD_GIT_REPOSITORY: ${{ secrets.CD_GIT_REPOSITORY }}
+          CD_CHART_REPO: ${{ secrets.CD_CHART_REPO }}
+          CD_MAIFEST_FOLDER_DEV: ${{ secrets.CD_MAIFEST_FOLDER_DEV }}
+          TAG_NAME: ${{ env.RELEASE_VERSION }}
+          REPO_NAME: ${{ env.REPO_NAME }}
+          DEPLOY_ENV: ${{ env.DEPLOY_ENV }}
+          GITLAB_PRIVATE_TOKEN: ${{ secrets.GITLAB_PRIVATE_TOKEN }}
+        run: ./scripts/actions/create_mr_in_gitlab.sh
+
+  get-previous-tag:
+    needs: [deploy-to-qa]
+    if: ${{ startsWith(github.ref, 'refs/tags/qa') }}
+    runs-on: ubuntu-latest
+    outputs:
+      previous_tag: ${{ steps.previous-tag.outputs.previous_tag }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Set env
+        run: |
+          echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      - name: get previous tag
+        id: previous-tag
+        uses: ./.github/get_previous_tag
+        with:
+          tag: ${{ env.RELEASE_VERSION }}
+      - name: echo
+        run: echo ${{ steps.previous-tag.outputs.previous_tag }}
+  create-release:
+    needs: [deploy-to-qa, get-previous-tag]
+    if: ${{ startsWith(github.ref, 'refs/tags/qa') }}
+    runs-on: ubuntu-latest
+    outputs:
+      changelog_message: ${{ steps.jira-changelog.outputs.changelog_message }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Set env
+        run: |
+          echo "VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      - name: Jira Release
+        id: jira-changelog
+        uses: ./.github/jira_release
+        with:
+          jira_host: ${{ secrets.JIRA_HOST }}
+          jira_email: ${{ secrets.JIRA_EMAIL }}
+          jira_token: ${{ secrets.JIRA_TOKEN }}
+          jira_base_url: ${{ secrets.JIRA_BASE_URL }}
+          source_control_range_from: ${{ needs.get-previous-tag.outputs.previous_tag }}
+          source_control_range_to: ${{ env.VERSION }}
+      - name: Create a GitHub release
+        id: github_release
+        uses: ./.github/github_release
+        with:
+          tag: ${{ env.VERSION }}
+          changelog_message: ${{ steps.jira-changelog.outputs.changelog_message }}
+      - name: Parse Jira Keys from changelog
+        id: jira_keys
+        uses: SpotDraft/jira-extract-issue-keys@v0.3-alpha
+        with:
+          commit-message: ${{ steps.jira-changelog.outputs.changelog_message }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Push Deployment Info to Jira
+        if: steps.jira_keys.outputs.jira-keys != ''
+        id: push_deployment_info_to_jira
+        uses: SpotDraft/jira-upload-deployment-info@v0.1-alpha
+        with:
+          cloud-instance-base-url: 'https://spotdraft.atlassian.net'
+          client-id: '${{ secrets.JIRA_CLIENT_ID }}'
+          client-secret: '${{ secrets.JIRA_CLIENT_SECRET }}'
+          deployment-sequence-number: '${{ github.run_id }}'
+          update-sequence-number: '${{ github.run_id }}'
+          issue-keys: "${{ steps.jira_keys.outputs.jira-keys }}"
+          display-name: "django-rest-api ${{ env.VERSION }} "
+          url: "https://github.com/${{ github.repository }}/releases/tag/${{ env.VERSION }}"
+          description: "django-rest-api ${{ env.VERSION }} "
+          last-updated: '${{github.event.head_commit.timestamp}}'
+          # label: 'Test Deployment Label'
+          state: 'successful'
+          pipeline-id: '${{ github.repository }} ${{ github.workflow }}'
+          pipeline-display-name: 'Workflow: ${{ github.workflow }} (#${{ github.run_number }})'
+          pipeline-url: 'https://github.com/${{ github.repository }}/actions/runs/${{github.run_id}}'
+          environment-id: 'QA'
+          environment-display-name: 'django-rest-api QA ALL_REGIONS'
+          environment-type: 'staging'
+  slack-alert:
+    needs: [create-release, deploy-to-qa]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Set env
+        run: |
+          echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      - name: Slack Notification
+        uses: ./.github/slack_alert
+        with:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_ICON: https://cdn.spotdraft.com/devops/rocket-launch.jpeg
+          SLACK_MESSAGE: ${{ needs.create-release.outputs.changelog_message }}
+          SLACK_TITLE: New tag  ${{ env.RELEASE_VERSION }} created on ${{ github.repository }} , MR to deploy changes to QA ${{ needs.deploy-to-qa.outputs.merge_request }}
+          SLACK_USERNAME: Github-Actions

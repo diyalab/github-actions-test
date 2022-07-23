@@ -13,12 +13,12 @@ jobs:
         if: ${{ startsWith(github.event.comment.body, 'run test') }}
         continue-on-error: true
         with:
-          github_token: ${{ secrets.REPO_GITHUB_TOKEN }}
+          github_token: ${{ secrets.GH_BOT_PAT }}
           labels: |
             ok-to-test
       - uses: actions-ecosystem/action-add-labels@v1
         if: ${{ startsWith(github.event.comment.body, 'run test') }}
         with:
-          github_token: ${{ secrets.REPO_GITHUB_TOKEN }}
+          github_token: ${{ secrets.GH_BOT_PAT }}
           labels: |
             ok-to-test

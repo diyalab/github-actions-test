@@ -29,22 +29,17 @@ jobs:
         run: git checkout -b ${{ steps.release-name.outputs.release }}
       - name: Initialize mandatory git config
         run: |
-          git config user.name "GitHub Actions"
-          git config user.email noreply@github.com
+          git config user.name ${{ secrets.GIT_BOT_USERNAME }}
+          git config user.email ${{ secrets.GIT_BOT_EMAIL }}
       - name: push Branch to remote
         run: git push -u origin ${{ steps.release-name.outputs.release }}:${{ steps.release-name.outputs.release }}
-      # - name: Tag commit
-      #   uses: tvdias/github-tagger@v0.0.1
-      #   with:
-      #     repo-token: "${{ secrets.GITHUB_TOKEN }}"
-      #     tag: "my_tag"
-      - name: git create and push tag
-        run: |
-          git branch -a
-          git tag ${{ steps.release-name.outputs.tag }}
-          git push --tags
+      - name: create and push tag
+        uses: tvdias/github-tagger@v0.0.1
+        with:
+          repo-token: "${{ secrets.GH_BOT_PAT }}"
+          tag: ${{ steps.release-name.outputs.tag }}
       - name: Slack Notification
-        uses: ./.github/slack_message
+        uses: ./.github/slack_alert
         with:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_COLOR: ${{ job.status }}

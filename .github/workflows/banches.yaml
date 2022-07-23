@@ -1,0 +1,19 @@
+name: Build Branch
+
+on:
+  push:
+    branches:
+      - "no-branch" # matches no  branch till users migrated to github
+      - "!master" #exclude master
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/build_and_push_ghcr
+        with:
+          push-image: false
+          environment: branch
+          image_name: ghcr.io/spotdraft/django-rest-api
+          GITHUB_TOKEN: ${{ secrets.GHCR_TOKEN }}
+          PYTHON_BASE_IMAGE: ${{ secrets.PYTHON_BASE_IMAGE }}

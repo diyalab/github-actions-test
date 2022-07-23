@@ -1,0 +1,32 @@
+name: Purge Image from GHCR
+description: "Delete Image from github container registry"
+inputs:
+  tag:
+    required: true
+    description: "The tag of the image that needs to be deleted"
+  owner:
+    required: true
+    default: "spotdraft"
+    description: "The organization name under which the image exists"
+  name:
+    required: true
+    default: "django-rest-api"
+    description: "The name of the image that needs to be deleted. Usually matches repo name"
+  GHCR_TOKEN:
+    required: true
+    description: "GitHub access token used to delete image from GHCR"
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v3
+    - name: Delete image
+      uses: SpotDraft/ghcr-delete-image-action@v1.0.0
+      env:
+        GHCR_TOKEN: ${{ inputs.GHCR_TOKEN }}
+      with:
+        # NOTE: at now only orgs is supported
+        owner: ${{ inputs.owner }}
+        name: ${{ inputs.name }}
+        # NOTE: using Personal Access Token
+        token: ${{ env.GHCR_TOKEN }}
+        tag: ${{ inputs.tag }}
