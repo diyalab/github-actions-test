@@ -29,8 +29,8 @@ jobs:
         run: git checkout -b ${{ steps.release-name.outputs.release }}
       - name: Initialize mandatory git config
         run: |
-          git config user.name ${{ secrets.GIT_BOT_USERNAME }}
-          git config user.email ${{ secrets.GIT_BOT_EMAIL }}
+          git config user.name "GitHub Action"
+          git config user.email "github-action@users.noreply.github.com"
       - name: push Branch to remote
         run: git push -u origin ${{ steps.release-name.outputs.release }}:${{ steps.release-name.outputs.release }}
       - name: create and push tag
