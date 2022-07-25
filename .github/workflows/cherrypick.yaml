@@ -53,7 +53,7 @@ jobs:
         run: |
           OLD_COMMIT_ID=`git rev-parse HEAD`
           echo "starting commit id $OLD_COMMIT_ID"
-          if [ "${{ inputs.commitIds }}" == "skip" ]; then
+          if [ "${{ inputs.commitIds }}" != "skip" ]; then
             for i in $(echo ${{ inputs.commitIds }}| sed "s/,/ /g" )
             do
                 commit=`echo $i | xargs`
