@@ -53,12 +53,14 @@ jobs:
         run: |
           OLD_COMMIT_ID=`git rev-parse HEAD`
           echo "starting commit id $OLD_COMMIT_ID"
-          for i in $(echo ${{ inputs.commitIds }}| sed "s/,/ /g" )
-          do
-              commit=`echo $i | xargs`
-              git cherry-pick -x $commit
-          done
-          git push origin $GITHUB_REF_NAME
+          if [ "${{ inputs.commitIds }}" == "skip" ]; then
+            for i in $(echo ${{ inputs.commitIds }}| sed "s/,/ /g" )
+            do
+                commit=`echo $i | xargs`
+                git cherry-pick -x $commit
+            done
+            git push origin $GITHUB_REF_NAME
+          fi
           LATEST_COMMIT_ID=`git rev-parse HEAD`
           echo "latest commit id $LATEST_COMMIT_ID"
           git push origin $GITHUB_REF_NAME
