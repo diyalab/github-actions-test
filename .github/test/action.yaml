@@ -13,3 +13,7 @@ runs:
       shell: bash
       run: |
         echo ${{ inputs.test }}
+        REGIONS=${{ inputs.test }}
+        for val in ${REGIONS[@]}; do
+          echo $val
+        done
