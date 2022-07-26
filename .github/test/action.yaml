@@ -4,6 +4,9 @@ inputs:
   test:
     required: true
     description: "test"
+  destination_image:
+    default: "gcr.io/sd/django-rest-api"
+    description: "Full path of image in container registry with out tag of destination image"
 runs:
   using: "composite"
   steps:
@@ -17,4 +20,5 @@ runs:
         for val in ${REGIONS//,/ }
         do
           echo $val
+          echo "docker tag ${{ inputs.source_image_name }}:${{ inputs.source_image_tag }} \ $val.${{ inputs.destination_image_name_europe }}:${{ inputs.destination_tag }} docker push $val.${{ inputs.destination_image_name_europe }}:${{ inputs.destination_tag }}"
         done
