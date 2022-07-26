@@ -63,7 +63,6 @@ jobs:
           fi
           LATEST_COMMIT_ID=`git rev-parse HEAD`
           echo "latest commit id $LATEST_COMMIT_ID"
-          git push origin $GITHUB_REF_NAME
           echo "LATEST_COMMIT_ID=$LATEST_COMMIT_ID" >> $GITHUB_ENV
           echo "VERSION=${{ needs.generate-new-tag.outputs.new_tag }}" >> $GITHUB_ENV
       - uses: rickstaa/action-create-tag@v1.3

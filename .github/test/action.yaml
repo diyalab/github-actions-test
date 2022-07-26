@@ -1,0 +1,15 @@
+name: Push Slack Message
+description: "Push Message to slack"
+inputs:
+  test:
+    required: true
+    description: "test"
+runs:
+  using: "composite"
+  steps:
+    - name: test
+      env:
+        GOOGLE_AUTH_KEY_CONTENT: ${{ inputs.GOOGLE_AUTH_KEY_CONTENT }}
+      shell: bash
+      run: |
+        echo ${{ inputs.test }}

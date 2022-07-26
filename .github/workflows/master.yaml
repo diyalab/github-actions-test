@@ -7,156 +7,154 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    outputs:
-      image_name: ${{ steps.build.outputs.image_name }}
-      image_tag: ${{ steps.build.outputs.image_tag }}
+    # outputs:
+    #   image_name: ${{ steps.build.outputs.image_name }}
+    #   image_tag: ${{ steps.build.outputs.image_tag }}
     steps:
       - uses: actions/checkout@v3
-      - uses: ./.github/build_and_push_ghcr
+      - uses: ./.github/test
         id: build
         with:
-          push-image: true
-          environment: master
-          image_name: ghcr.io/spotdraft/django-rest-api
-          GITHUB_TOKEN: ${{ secrets.GHCR_TOKEN }}
-          PYTHON_BASE_IMAGE: ${{ secrets.PYTHON_BASE_IMAGE }}
-  sonar-scan:
-    runs-on: ubuntu-latest
-    container: sonarsource/sonar-scanner-cli:4.7.0
-    env:
-      SONAR_HOST_URL: https://sonarqube.dev.spotdraft.com
-    steps:
-      - uses: actions/checkout@v3
-      - name: sonar-scan
-        run: |
-          export SONAR_PROJECT_BASE_DIR=${{ github.workspace }}
-          export SONAR_TOKEN=${{ secrets.SONAR_TOKEN }}
-          sonar-scanner
+          test:
+            - siva
+            - ganesh
+  # sonar-scan:
+  #   runs-on: ubuntu-latest
+  #   container: sonarsource/sonar-scanner-cli:4.7.0
+  #   env:
+  #     SONAR_HOST_URL: https://sonarqube.dev.spotdraft.com
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: sonar-scan
+  #       run: |
+  #         export SONAR_PROJECT_BASE_DIR=${{ github.workspace }}
+  #         export SONAR_TOKEN=${{ secrets.SONAR_TOKEN }}
+  #         sonar-scanner
 
 
-  tests:
-    needs: [build, sonar-scan]
-    name: Unit Tests
-    services:
-      postgres:
-        image: ghcr.io/spotdraft/postgres:11.3-with-migrations
-        credentials:
-          username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_TOKEN }}
-        env:
-          POSTGRES_HOST_AUTH_METHOD: trust
-          PGDATA: "/postgres"
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-    runs-on: ubuntu-latest
-    container: ${{ needs.build.outputs.image_name }}:${{ needs.build.outputs.image_tag }}
-    steps:
-      - uses: actions/checkout@v3
-      - uses: ./.github/unit_tests
-        with:
-          tag: ${{ needs.build.outputs.image_tag }}
-          image_name: ${{ needs.build.outputs.image_name }}
-  mypy:
-    needs: [build, sonar-scan]
-    name: MyPy lint
-    runs-on: ubuntu-latest
-    container: ${{ needs.build.outputs.image_name }}:${{ needs.build.outputs.image_tag }}
-    steps:
-      - uses: actions/checkout@v3
-      - uses: ./.github/mypy_lint
-        id: mypy
-        with:
-          tag: ${{ needs.build.outputs.image_tag }}
-          image_name: ${{ needs.build.outputs.image_name }}
+  # tests:
+  #   needs: [build, sonar-scan]
+  #   name: Unit Tests
+  #   services:
+  #     postgres:
+  #       image: ghcr.io/spotdraft/postgres:11.3-with-migrations
+  #       credentials:
+  #         username: ${{ github.actor }}
+  #         password: ${{ secrets.GHCR_TOKEN }}
+  #       env:
+  #         POSTGRES_HOST_AUTH_METHOD: trust
+  #         PGDATA: "/postgres"
+  #       options: >-
+  #         --health-cmd pg_isready
+  #         --health-interval 10s
+  #         --health-timeout 5s
+  #         --health-retries 5
+  #   runs-on: ubuntu-latest
+  #   container: ${{ needs.build.outputs.image_name }}:${{ needs.build.outputs.image_tag }}
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: ./.github/unit_tests
+  #       with:
+  #         tag: ${{ needs.build.outputs.image_tag }}
+  #         image_name: ${{ needs.build.outputs.image_name }}
+  # mypy:
+  #   needs: [build, sonar-scan]
+  #   name: MyPy lint
+  #   runs-on: ubuntu-latest
+  #   container: ${{ needs.build.outputs.image_name }}:${{ needs.build.outputs.image_tag }}
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: ./.github/mypy_lint
+  #       id: mypy
+  #       with:
+  #         tag: ${{ needs.build.outputs.image_tag }}
+  #         image_name: ${{ needs.build.outputs.image_name }}
 
-  push-image-to-gcr:
-    needs: [build, tests, mypy]
-    name: Push image to GCR
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: ./.github/push_image_to_gcr
-        id: push
-        with:
-          source_image_tag: ${{ needs.build.outputs.image_tag }}
-          destination_tag: ${{ needs.build.outputs.image_tag }}
-          destination_image_name: eu.gcr.io/spotdraft-qa/sd/django-rest-api
-          source_image_name: ${{ needs.build.outputs.image_name }}
-          GOOGLE_AUTH_KEY_CONTENT: ${{ secrets.GOOGLE_AUTH_KEY_CONTENT }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
-  deploy-to-dev:
-    needs: [build, push-image-to-gcr]
-    runs-on: ubuntu-latest
-    container: alpine/git:1.0.27
-    steps:
-      - name: Set env
-        run: |
-          echo "RELEASE_VERSION=${{ needs.build.outputs.image_tag }}" >> $GITHUB_ENV
-      - name: deploy to dev
-        run: |
-          export GCR_REPO=asia.gcr.io/draftspot-177614/sd/django-rest-api
-          export TAG_NAME=${{ env.RELEASE_VERSION }}
-          mkdir -p /root/.ssh
-          echo "${{ secrets.GITLAB_SSH_PRIVATE_KEY }}" > /root/.ssh/id_rsa
-          ssh-keyscan -H gitlab.dev.spotdraft.com > /root/.ssh/known_hosts
-          chmod 600 /root/.ssh/id_rsa
-          apk add --no-cache git && apk add yq
-          yq --version
-          git config --global user.name "siva"
-          git config --global user.email "siva@spotdraft.com"
-          git clone --single-branch --branch master ${{ secrets.CD_GIT_REPOSITORY }}
-          cd ${{ secrets.CD_CHART_REPO }}/${{ secrets.CD_MAIFEST_FOLDER_DEV }}
-          yq w -i values-staging.yaml  "django-app.image.tag" "$TAG_NAME"
-          cat values-staging.yaml
-          git commit -am "update image tag from ci pipeline for ${{ secrets.CD_MAIFEST_FOLDER_DEV }} DEV DJANGO BE" && git push origin master
-  push-deployment-info-to-jira:
-    needs: [deploy-to-dev]
-    runs-on: ubuntu-latest
-    outputs:
-      changelog_message: ${{ steps.jira-changelog.outputs.changelog_message }}
-    steps:
-      - name: Parse Jira Keys from changelog
-        id: jira_keys
-        uses: SpotDraft/jira-extract-issue-keys@v0.3-alpha
-        with:
-          parse-all-commits: ${{ github.event_name == 'push' }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Push Deployment Info to Jira
-        if: steps.jira_keys.outputs.jira-keys != ''
-        id: push_deployment_info_to_jira
-        uses: SpotDraft/jira-upload-deployment-info@v0.1-alpha
-        with:
-          cloud-instance-base-url: 'https://spotdraft.atlassian.net'
-          client-id: '${{ secrets.JIRA_CLIENT_ID }}'
-          client-secret: '${{ secrets.JIRA_CLIENT_SECRET }}'
-          deployment-sequence-number: '${{ github.run_id }}'
-          update-sequence-number: '${{ github.run_id }}'
-          issue-keys: "${{ steps.jira_keys.outputs.jira-keys }}"
-          display-name: "django-rest-api master "
-          url: "https://github.com/${{ github.repository }}/releases/tag/${{ env.RELEASE_VERSION }}"
-          description: "django-rest-api ${{ env.RELEASE_VERSION }} "
-          last-updated: '${{github.event.head_commit.timestamp}}'
-          # label: 'Test Deployment Label'
-          state: 'successful'
-          pipeline-id: '${{ github.repository }} ${{ github.workflow }}'
-          pipeline-display-name: 'Workflow: ${{ github.workflow }} (#${{ github.run_number }})'
-          pipeline-url: 'https://github.com/${{ github.repository }}/actions/runs/${{github.run_id}}'
-          environment-id: 'DEV'
-          environment-display-name: 'django-rest-api DEV EU'
-          environment-type: 'development'
-  purge-image:
-    if: always()
-    needs: [build, push-image-to-gcr]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: ./.github/purge_image_from_ghcr
-        with:
-          owner: spotdraft
-          name: django-rest-api
-          tag: ${{ needs.build.outputs.image_tag }}
-          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+  # push-image-to-gcr:
+  #   needs: [build, tests, mypy]
+  #   name: Push image to GCR
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: ./.github/push_image_to_gcr
+  #       id: push
+  #       with:
+  #         source_image_tag: ${{ needs.build.outputs.image_tag }}
+  #         destination_tag: ${{ needs.build.outputs.image_tag }}
+  #         destination_image_name: eu.gcr.io/spotdraft-qa/sd/django-rest-api
+  #         source_image_name: ${{ needs.build.outputs.image_name }}
+  #         GOOGLE_AUTH_KEY_CONTENT: ${{ secrets.GOOGLE_AUTH_KEY_CONTENT }}
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
+  # deploy-to-dev:
+  #   needs: [build, push-image-to-gcr]
+  #   runs-on: ubuntu-latest
+  #   container: alpine/git:1.0.27
+  #   steps:
+  #     - name: Set env
+  #       run: |
+  #         echo "RELEASE_VERSION=${{ needs.build.outputs.image_tag }}" >> $GITHUB_ENV
+  #     - name: deploy to dev
+  #       run: |
+  #         export GCR_REPO=asia.gcr.io/draftspot-177614/sd/django-rest-api
+  #         export TAG_NAME=${{ env.RELEASE_VERSION }}
+  #         mkdir -p /root/.ssh
+  #         echo "${{ secrets.GITLAB_SSH_PRIVATE_KEY }}" > /root/.ssh/id_rsa
+  #         ssh-keyscan -H gitlab.dev.spotdraft.com > /root/.ssh/known_hosts
+  #         chmod 600 /root/.ssh/id_rsa
+  #         apk add --no-cache git && apk add yq
+  #         yq --version
+  #         git config --global user.name "siva"
+  #         git config --global user.email "siva@spotdraft.com"
+  #         git clone --single-branch --branch master ${{ secrets.CD_GIT_REPOSITORY }}
+  #         cd ${{ secrets.CD_CHART_REPO }}/${{ secrets.CD_MAIFEST_FOLDER_DEV }}
+  #         yq w -i values-staging.yaml  "django-app.image.tag" "$TAG_NAME"
+  #         cat values-staging.yaml
+  #         git commit -am "update image tag from ci pipeline for ${{ secrets.CD_MAIFEST_FOLDER_DEV }} DEV DJANGO BE" && git push origin master
+  # push-deployment-info-to-jira:
+  #   needs: [deploy-to-dev]
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     changelog_message: ${{ steps.jira-changelog.outputs.changelog_message }}
+  #   steps:
+  #     - name: Parse Jira Keys from changelog
+  #       id: jira_keys
+  #       uses: SpotDraft/jira-extract-issue-keys@v0.3-alpha
+  #       with:
+  #         parse-all-commits: ${{ github.event_name == 'push' }}
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #     - name: Push Deployment Info to Jira
+  #       if: steps.jira_keys.outputs.jira-keys != ''
+  #       id: push_deployment_info_to_jira
+  #       uses: SpotDraft/jira-upload-deployment-info@v0.1-alpha
+  #       with:
+  #         cloud-instance-base-url: 'https://spotdraft.atlassian.net'
+  #         client-id: '${{ secrets.JIRA_CLIENT_ID }}'
+  #         client-secret: '${{ secrets.JIRA_CLIENT_SECRET }}'
+  #         deployment-sequence-number: '${{ github.run_id }}'
+  #         update-sequence-number: '${{ github.run_id }}'
+  #         issue-keys: "${{ steps.jira_keys.outputs.jira-keys }}"
+  #         display-name: "django-rest-api master "
+  #         url: "https://github.com/${{ github.repository }}/releases/tag/${{ env.RELEASE_VERSION }}"
+  #         description: "django-rest-api ${{ env.RELEASE_VERSION }} "
+  #         last-updated: '${{github.event.head_commit.timestamp}}'
+  #         # label: 'Test Deployment Label'
+  #         state: 'successful'
+  #         pipeline-id: '${{ github.repository }} ${{ github.workflow }}'
+  #         pipeline-display-name: 'Workflow: ${{ github.workflow }} (#${{ github.run_number }})'
+  #         pipeline-url: 'https://github.com/${{ github.repository }}/actions/runs/${{github.run_id}}'
+  #         environment-id: 'DEV'
+  #         environment-display-name: 'django-rest-api DEV EU'
+  #         environment-type: 'development'
+  # purge-image:
+  #   if: always()
+  #   needs: [build, push-image-to-gcr]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: ./.github/purge_image_from_ghcr
+  #       with:
+  #         owner: spotdraft
+  #         name: django-rest-api
+  #         tag: ${{ needs.build.outputs.image_tag }}
+  #         GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
