@@ -15,7 +15,7 @@ jobs:
       - uses: ./.github/test
         id: build
         with:
-          test: "eu,asia,us"
+          test: "eu"
   # sonar-scan:
   #   runs-on: ubuntu-latest
   #   container: sonarsource/sonar-scanner-cli:4.7.0
