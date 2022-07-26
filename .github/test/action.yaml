@@ -20,5 +20,5 @@ runs:
         for val in ${REGIONS//,/ }
         do
           echo $val
-          echo "docker tag ${{ inputs.source_image_name }}:${{ inputs.source_image_tag }} \ $val.${{ inputs.destination_image_name }}:${{ inputs.destination_tag }} docker push $val.${{ inputs.destination_image_name }}:${{ inputs.destination_tag }}"
+          echo "docker tag ${{ inputs.source_image_name }}:${{ inputs.source_image_tag }} \ $val.${{ inputs.destination_image }}:${{ inputs.destination_tag }} docker push $val.${{ inputs.destination_image }}:${{ inputs.destination_tag }}"
         done
