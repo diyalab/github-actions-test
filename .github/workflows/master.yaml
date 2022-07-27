@@ -20,7 +20,7 @@ jobs:
         run: |
           set -x
           docker pull ghcr.io/spotdraft/postgres:20220720
-          RESULT=$?
+          RESULT="$?"
           set +x
           if [ $RESULT == 0 ]; then
               POSTGRES_TAG=20220720
