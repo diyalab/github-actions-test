@@ -23,7 +23,7 @@ jobs:
       - name: postgres
         run: |
           
-          if ! docker pull ghcr.io/spotdraft/postgres:${{ steps.release-date.outputs.release_date }}
+          if docker pull ghcr.io/spotdraft/postgres:${{ steps.release-date.outputs.release_date }}
           then
               POSTGRES_TAG=20220720
           else
