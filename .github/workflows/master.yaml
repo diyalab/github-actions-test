@@ -16,10 +16,14 @@ jobs:
       #   id: build
       #   with:
       #     test: "eu"
+      - name: releae
+        id: release-date
+        run: |
+          echo "::set-output name=release_date::20220720"
       - name: postgres
         run: |
           
-          if [ docker pull ghcr.io/spotdraft/postgres:20220720 ]; then
+          if [ docker pull ghcr.io/spotdraft/postgres:${{ steps.release-date.outputs.release_date }} ]; then
               POSTGRES_TAG=20220720
           else
               POSTGRES_TAG="11.3-with-migrations"
