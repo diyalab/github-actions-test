@@ -12,10 +12,21 @@ jobs:
     #   image_tag: ${{ steps.build.outputs.image_tag }}
     steps:
       - uses: actions/checkout@v3
-      - uses: ./.github/test
-        id: build
-        with:
-          test: "eu"
+      # - uses: ./.github/test
+      #   id: build
+      #   with:
+      #     test: "eu"
+      - name: postgres
+        run: |
+          docker pull ghcr.io/spotdraft/postgres:20220720
+          RESULT=$?
+          
+          if [ $RESULT == 0 ]; then
+              POSTGRES_TAG=20220720
+          else
+              POSTGRES_TAG="11.3-with-migrations"
+          fi
+          echo $POSTGRES_TAG
   # sonar-scan:
   #   runs-on: ubuntu-latest
   #   container: sonarsource/sonar-scanner-cli:4.7.0
