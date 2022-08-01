@@ -31,7 +31,8 @@ runs:
         release_date=`cut -d'-' -f2 <<< ${{ inputs.release-branch }}`
         search_key=${{ inputs.environment }}_$release_date
         echo $search_key
-        if [ ! git for-each-ref --sort=creatordate --format '%(refname) %(creatordate)' refs/tags | grep $search_key > tags.txt ]
+        git for-each-ref --sort=creatordate --format '%(refname) %(creatordate)' refs/tags | grep $search_key > tags.txt
+        if [ $? -eq 0 ]
         then
           echo "inside if 1"
           current_latest_tag_with_datetime=`tail -1 tags.txt | xargs`
