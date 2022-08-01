@@ -31,7 +31,6 @@ runs:
         release_date=`cut -d'-' -f2 <<< ${{ inputs.release-branch }}`
         search_key=${{ inputs.environment }}_$release_date
         echo $search_key
-        git for-each-ref --sort=creatordate --format '%(refname) %(creatordate)' refs/tags | grep $search_key > tags.txt
         if [ tags=$(git for-each-ref --sort=creatordate --format '%(refname) %(creatordate)' refs/tags | grep $search_key > tags.txt) ]
         then
           echo "inside if 1"
