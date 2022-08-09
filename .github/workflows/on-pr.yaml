@@ -23,20 +23,20 @@ jobs:
     needs: build
     name: Unit Tests
     # if: ${{ github.event.label.name == 'ok-to-test' }}
-    services:
-      postgres:
-        image: ghcr.io/spotdraft/postgres:11.3-with-migrations
-        credentials:
-          username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_TOKEN }}
-        env:
-          POSTGRES_HOST_AUTH_METHOD: trust
-          PGDATA: "/postgres"
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+    # services:
+    #   postgres:
+    #     image: ghcr.io/spotdraft/postgres:11.3-with-migrations
+    #     credentials:
+    #       username: ${{ github.actor }}
+    #       password: ${{ secrets.GHCR_TOKEN }}
+    #     env:
+    #       POSTGRES_HOST_AUTH_METHOD: trust
+    #       PGDATA: "/postgres"
+    #     options: >-
+    #       --health-cmd pg_isready
+    #       --health-interval 10s
+    #       --health-timeout 5s
+    #       --health-retries 5
     runs-on: ubuntu-latest
     # container: ${{ needs.build.outputs.image_name }}:${{ needs.build.outputs.image_tag }}
     steps:
