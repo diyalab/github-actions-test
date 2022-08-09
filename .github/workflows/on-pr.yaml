@@ -67,7 +67,7 @@ jobs:
     name: MyPy lint
     # if: ${{ github.event.label.name == 'ok-to-test' }}
     runs-on: ubuntu-latest
-    container: ${{ needs.build.outputs.image_name }}:${{ needs.build.outputs.image_tag }}
+    # container: ${{ needs.build.outputs.image_name }}:${{ needs.build.outputs.image_tag }}
     steps:
       - uses: actions/checkout@v3
       # - uses: ./.github/mypy_lint
