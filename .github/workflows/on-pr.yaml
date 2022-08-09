@@ -119,7 +119,6 @@ jobs:
   #     #     name: django-rest-api
   #     #     tag: ${{ needs.build.outputs.image_tag }}
   #     #     GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
-
   ci-success:
     name: ci
     if: ${{ success() }}
