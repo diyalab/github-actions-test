@@ -5,5 +5,6 @@ const regExp = RegExpFromString("/\[([A-Z]+\-[0-9]+)\]/i");
 console.log(regExp);
 
 
+
 siva ganesh 123  124 123 456 456 566
 
