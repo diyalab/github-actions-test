@@ -32,6 +32,16 @@ jobs:
       #         POSTGRES_TAG="11.3-with-migrations"
       #     fi
       #     echo $POSTGRES_TAG
+  ci-success:
+    name: ci
+    if: ${{ success() }}
+    needs:
+      # - exfm
+      - build
+    runs-on: ubuntu-latest
+    steps:
+      - name: CI succeeded
+        run: exit 0
   # sonar-scan:
   #   runs-on: ubuntu-latest
   #   container: sonarsource/sonar-scanner-cli:4.7.0
