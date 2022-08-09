@@ -11,6 +11,7 @@ jobs:
       image_tag: ${{ steps.build.outputs.image_tag }}
     steps:
       - uses: actions/checkout@v3
+      - run: sleep 200
       # - uses: ./.github/build_and_push_ghcr
       #   id: build
       #   with:
@@ -118,7 +119,7 @@ jobs:
   #     #     name: django-rest-api
   #     #     tag: ${{ needs.build.outputs.image_tag }}
   #     #     GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
-  
+
   ci-success:
     name: ci
     if: ${{ success() }}
