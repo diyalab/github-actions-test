@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - "main" #only on master
+      - staging
+      - trying
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -20,16 +22,26 @@ jobs:
         id: release-date
         run: |
           echo "::set-output name=release_date::20220720"
-      - name: postgres
-        run: |
+      # - name: postgres
+      #   run: |
           
-          if docker pull ghcr.io/spotdraft/postgres:${{ steps.release-date.outputs.release_date }}
-          then
-              POSTGRES_TAG=20220720
-          else
-              POSTGRES_TAG="11.3-with-migrations"
-          fi
-          echo $POSTGRES_TAG
+      #     if docker pull ghcr.io/spotdraft/postgres:${{ steps.release-date.outputs.release_date }}
+      #     then
+      #         POSTGRES_TAG=20220720
+      #     else
+      #         POSTGRES_TAG="11.3-with-migrations"
+      #     fi
+      #     echo $POSTGRES_TAG
+  ci-success:
+    name: ci
+    if: ${{ success() }}
+    needs:
+      # - exfm
+      - build
+    runs-on: ubuntu-latest
+    steps:
+      - name: CI succeeded
+        run: exit 0
   # sonar-scan:
   #   runs-on: ubuntu-latest
   #   container: sonarsource/sonar-scanner-cli:4.7.0
