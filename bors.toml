@@ -1,2 +1,2 @@
-status = ["releae","ci"]
+status = ["build"]
 use_squash_merge = true
