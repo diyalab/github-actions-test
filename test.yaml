@@ -3,5 +3,5 @@ django-app:
     repository: eu.gcr.io/spotdraft-qa/sd/django-rest-api
     tag: dev1
 siva:
-  ganesh: dev1123456
+  ganesh: dev11234567
   
