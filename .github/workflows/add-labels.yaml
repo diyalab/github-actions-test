@@ -1,24 +1,24 @@
-name: Add Labels
+# name: Add Labels
 
-on:
-  issue_comment:
-    types: [created]
+# on:
+#   issue_comment:
+#     types: [created]
 
-jobs:
-  add_labels:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-ecosystem/action-remove-labels@v1
-        if: ${{ startsWith(github.event.comment.body, 'run test') }}
-        continue-on-error: true
-        with:
-          github_token: ${{ secrets.GH_BOT_PAT }}
-          labels: |
-            ok-to-test
-      - uses: actions-ecosystem/action-add-labels@v1
-        if: ${{ startsWith(github.event.comment.body, 'run test') }}
-        with:
-          github_token: ${{ secrets.GH_BOT_PAT }}
-          labels: |
-            ok-to-test
+# jobs:
+#   add_labels:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v2
+#       - uses: actions-ecosystem/action-remove-labels@v1
+#         if: ${{ startsWith(github.event.comment.body, 'run test') }}
+#         continue-on-error: true
+#         with:
+#           github_token: ${{ secrets.GH_BOT_PAT }}
+#           labels: |
+#             ok-to-test
+#       - uses: actions-ecosystem/action-add-labels@v1
+#         if: ${{ startsWith(github.event.comment.body, 'run test') }}
+#         with:
+#           github_token: ${{ secrets.GH_BOT_PAT }}
+#           labels: |
+#             ok-to-test
