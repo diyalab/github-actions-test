@@ -1,18 +1,18 @@
-name: Delete Label
+# name: Delete Label
 
-on:
-  pull_request:
-    types: [synchronize]
+# on:
+#   pull_request:
+#     types: [synchronize]
 
-jobs:
-  add_labels:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-ecosystem/action-remove-labels@v1
-        with:
-          github_token: ${{ secrets.GH_BOT_PAT }}
-          labels: |
-            ok-to-test
-            test-failed
-            test-passed
+# jobs:
+#   add_labels:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v2
+#       - uses: actions-ecosystem/action-remove-labels@v1
+#         with:
+#           github_token: ${{ secrets.GH_BOT_PAT }}
+#           labels: |
+#             ok-to-test
+#             test-failed
+#             test-passed
