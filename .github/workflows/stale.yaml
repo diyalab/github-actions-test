@@ -1,0 +1,13 @@
+name: 'Label stale PR's'
+on:
+  schedule:
+    - cron: '30 1 * * *'
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v5
+        with:
+          stale-pr-label: 'stale'
+          days-before-stale: 1
