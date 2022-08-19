@@ -1,4 +1,4 @@
-name: 'Label stale PR's'
+name: "Label stale PR's"
 on:
   schedule:
     - cron: '* * * * *'
