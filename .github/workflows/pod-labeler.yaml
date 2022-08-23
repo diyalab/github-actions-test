@@ -12,5 +12,5 @@ jobs:
     - uses: actions/labeler@v4.0.1
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
-        configuration-path: .github/pod-label-config.yml
+        configuration-path: .github/pod-label-config.yaml
         sync-labels: true
