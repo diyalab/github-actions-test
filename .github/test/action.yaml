@@ -6,7 +6,7 @@ inputs:
     description: "test"
   destination_image:
     default: "gcr.io/sd/django-rest-api"
-    description: "Full path of image in container registry with out tag of destination image"
+    description: "Full path of image   in container registry with out tag of destination image"
 runs:
   using: "composite"
   steps:
